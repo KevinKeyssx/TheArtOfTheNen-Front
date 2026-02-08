@@ -1,0 +1,259 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:is(.dark *));
+
+/* Hunter x Hunter Nen Theme - Dark & Mysterious */
+:root {
+    --background: hsl(220 20% 6%);
+    --foreground: hsl(60 10% 95%);
+    --card: hsl(220 18% 10%);
+    --card-foreground: hsl(60 10% 95%);
+    --popover: hsl(220 18% 10%);
+    --popover-foreground: hsl(60 10% 95%);
+    --primary: hsl(45 95% 55%);
+    --primary-foreground: hsl(220 20% 6%);
+    --secondary: hsl(220 15% 15%);
+    --secondary-foreground: hsl(60 10% 95%);
+    --muted: hsl(220 15% 18%);
+    --muted-foreground: hsl(220 10% 55%);
+    --accent: hsl(35 90% 50%);
+    --accent-foreground: hsl(220 20% 6%);
+    --destructive: hsl(0 72% 50%);
+    --destructive-foreground: hsl(0 0% 98%);
+    --border: hsl(220 15% 20%);
+    --input: hsl(220 15% 15%);
+    --ring: hsl(45 95% 55%);
+    
+    /* Nen Type Colors */
+    --nen-intensificacion: hsl(45 100% 50%);
+    --nen-transmutacion: hsl(280 80% 60%);
+    --nen-materializacion: hsl(200 90% 55%);
+    --nen-especializacion: hsl(330 85% 55%);
+    --nen-manipulacion: hsl(140 70% 45%);
+    --nen-emision: hsl(25 95% 55%);
+    
+    --radius: 0.6rem;
+    --sidebar-background: hsl(220 18% 8%);
+    --sidebar-foreground: hsl(60 10% 95%);
+    --sidebar-primary: hsl(45 95% 55%);
+    --sidebar-primary-foreground: hsl(220 20% 6%);
+    --sidebar-accent: hsl(220 15% 15%);
+    --sidebar-accent-foreground: hsl(60 10% 95%);
+    --sidebar-border: hsl(220 15% 20%);
+    --sidebar-ring: hsl(45 95% 55%);
+}
+
+@theme {
+    --radius-sm: calc(var(--radius) - 4px);
+    --radius-md: calc(var(--radius) - 2px);
+    --radius-lg: var(--radius);
+    --radius-xl: calc(var(--radius) + 4px);
+    --color-background: var(--background);
+    --color-foreground: var(--foreground);
+    --color-card: var(--card);
+    --color-card-foreground: var(--card-foreground);
+    --color-popover: var(--popover);
+    --color-popover-foreground: var(--popover-foreground);
+    --color-primary: var(--primary);
+    --color-primary-foreground: var(--primary-foreground);
+    --color-secondary: var(--secondary);
+    --color-secondary-foreground: var(--secondary-foreground);
+    --color-muted: var(--muted);
+    --color-muted-foreground: var(--muted-foreground);
+    --color-accent: var(--accent);
+    --color-accent-foreground: var(--accent-foreground);
+    --color-destructive: var(--destructive);
+    --color-border: var(--border);
+    --color-input: var(--input);
+    --color-ring: var(--ring);
+    
+    /* Nen Colors for Tailwind */
+    --color-nen-int: var(--nen-intensificacion);
+    --color-nen-tra: var(--nen-transmutacion);
+    --color-nen-mat: var(--nen-materializacion);
+    --color-nen-esp: var(--nen-especializacion);
+    --color-nen-man: var(--nen-manipulacion);
+    --color-nen-emi: var(--nen-emision);
+    
+    /* Purple colors */
+    --color-purple-300: rgb(216, 180, 254);
+    --color-purple-400: rgb(192, 132, 252);
+    --color-purple-500: rgb(168, 85, 247);
+    --color-purple-600: rgb(147, 51, 234);
+    --color-purple-700: rgb(126, 34, 206);
+    --color-purple-800: rgb(107, 33, 168);
+    --color-purple-900: rgb(88, 28, 135);
+    
+    /* Amber colors */
+    --color-amber-200: rgb(253, 230, 138);
+    --color-amber-500: rgb(245, 158, 11);
+    --color-amber-600: rgb(217, 119, 6);
+    
+    /* Zinc colors */
+    --color-zinc-200: rgb(228, 228, 231);
+    --color-zinc-300: rgb(212, 212, 216);
+    --color-zinc-400: rgb(161, 161, 170);
+    --color-zinc-500: rgb(113, 113, 122);
+    --color-zinc-600: rgb(82, 82, 91);
+    --color-zinc-700: rgb(63, 63, 70);
+    --color-zinc-800: rgb(39, 39, 42);
+    --color-zinc-900: rgb(24, 24, 27);
+    
+    --color-sidebar: var(--sidebar-background);
+    --color-sidebar-foreground: var(--sidebar-foreground);
+    --color-sidebar-primary: var(--sidebar-primary);
+    --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+    --color-sidebar-accent: var(--sidebar-accent);
+    --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+    --color-sidebar-border: var(--sidebar-border);
+    --color-sidebar-ring: var(--sidebar-ring);
+}
+
+@layer base {
+    * {
+        @apply border-border outline-ring/50;
+    }
+    html {
+        scroll-behavior: smooth;
+    }
+    body {
+        @apply bg-background text-foreground;
+    }
+}
+
+/* Nen Glow Effects */
+.glow-nen-int {
+    box-shadow: 0 0 20px hsl(45 100% 50% / 0.4), 0 0 40px hsl(45 100% 50% / 0.2);
+}
+.glow-nen-tra {
+    box-shadow: 0 0 20px hsl(280 80% 60% / 0.4), 0 0 40px hsl(280 80% 60% / 0.2);
+}
+.glow-nen-mat {
+    box-shadow: 0 0 20px hsl(200 90% 55% / 0.4), 0 0 40px hsl(200 90% 55% / 0.2);
+}
+.glow-nen-esp {
+    box-shadow: 0 0 20px hsl(330 85% 55% / 0.4), 0 0 40px hsl(330 85% 55% / 0.2);
+}
+.glow-nen-man {
+    box-shadow: 0 0 20px hsl(140 70% 45% / 0.4), 0 0 40px hsl(140 70% 45% / 0.2);
+}
+.glow-nen-emi {
+    box-shadow: 0 0 20px hsl(25 95% 55% / 0.4), 0 0 40px hsl(25 95% 55% / 0.2);
+}
+
+/* Aura Animation */
+@keyframes aura-pulse {
+    0%, 100% { opacity: 0.6; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.05); }
+}
+
+.aura-pulse {
+    animation: aura-pulse 2s ease-in-out infinite;
+}
+
+/* Particle Animation */
+@keyframes float-particle {
+    0%, 100% { transform: translateY(0) translateX(0); opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { transform: translateY(-100px) translateX(20px); opacity: 0; }
+}
+
+.particle {
+    animation: float-particle 3s ease-in-out infinite;
+}
+
+/* Fade in animation */
+@keyframes fade-in-up {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in-up {
+    animation: fade-in-up 0.6s ease-out forwards;
+}
+
+/* Progress bar animation */
+@keyframes progress-fill {
+    from { width: 0%; }
+}
+
+.animate-progress {
+    animation: progress-fill 0.5s ease-out forwards;
+}
+
+/* Reveal animation */
+@keyframes reveal {
+    0% { transform: scale(0.8); opacity: 0; }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.animate-reveal {
+    animation: reveal 0.8s ease-out forwards;
+}
+
+/* Energy charge animation */
+@keyframes energy-charge {
+    0% { transform: scale(0); opacity: 0; }
+    30% { transform: scale(1.3); opacity: 0.8; }
+    60% { transform: scale(0.9); opacity: 1; }
+    80% { transform: scale(1.1); opacity: 0.9; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.animate-energy-charge {
+    animation: energy-charge 1.2s ease-out forwards;
+}
+
+/* Glow pulse */
+@keyframes glow-pulse {
+    0%, 100% { box-shadow: 0 0 20px currentColor, 0 0 40px currentColor; opacity: 0.6; }
+    50% { box-shadow: 0 0 40px currentColor, 0 0 80px currentColor; opacity: 1; }
+}
+
+.animate-glow-pulse {
+    animation: glow-pulse 2s ease-in-out infinite;
+}
+
+/* Text reveal letter by letter illusion */
+@keyframes typewriter-line {
+    from { max-height: 0; opacity: 0; }
+    to { max-height: 200px; opacity: 1; }
+}
+
+.animate-typewriter-line {
+    animation: typewriter-line 0.4s ease-out forwards;
+    overflow: hidden;
+}
+
+/* Float up particles */
+@keyframes rise-particle {
+    0% { transform: translateY(0) scale(1); opacity: 1; }
+    100% { transform: translateY(-120px) scale(0); opacity: 0; }
+}
+
+.animate-rise-particle {
+    animation: rise-particle 2s ease-out forwards;
+}
+
+/* Shimmer effect */
+@keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
+.animate-shimmer {
+    background-size: 200% 100%;
+    animation: shimmer 3s linear infinite;
+}
+
+/* Spin slow */
+@keyframes spin-slow {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.animate-spin-slow {
+    animation: spin-slow 8s linear infinite;
+}
