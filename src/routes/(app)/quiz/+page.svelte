@@ -3,10 +3,28 @@
     import QuizResult                                   from '$lib/components/quiz-result.svelte';
 
 
+    let audio               : HTMLAudioElement | null = null;
     let isSoundEffectMuted  = $state( false );
 
-
     type QuizState = 'intro' | 'quiz' | 'calculating' | 'result';
+
+    // Mapeo de estados a archivos de sonido
+    const stateSounds: Partial<Record<QuizState, string>> = {
+        calculating : '/sounds/loading.wav',
+        result      : '/sounds/celebrate.wav'
+    };
+
+    // Reproducir sonido según el estado del quiz
+    $effect(() => {
+        const soundFile = stateSounds[ quizState ];
+
+        if ( soundFile && ( quizState !== 'result' || result )) {
+            audio?.pause();
+            audio           = new Audio( soundFile );
+            audio.volume    = 0.3;
+            audio.play().catch( err => console.error( 'Error al reproducir sonido:', err ));
+        }
+    });
 
     // Funcion para mezclar array (Fisher-Yates shuffle)
     function shuffleArray<T>( array: T[] ): T[] {
@@ -19,7 +37,6 @@
 
         return shuffled;
     }
-
 
     // Obtener preguntas con opciones ya shuffleadas
     function getQuestionsWithShuffledOptions() {
