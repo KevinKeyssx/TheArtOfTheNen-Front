@@ -1,10 +1,18 @@
 <script lang="ts">
-    import { getRandomQuestions, calculateNenResult }   from '$lib/data/nen-data';
-    import QuizResult                                   from '$lib/components/quiz-result.svelte';
+    import { goto } from '$app/navigation';
+    import { page } from '$app/state';
+
+    import {
+        getRandomQuestions,
+        calculateNenResult
+    }                   from '$lib/data/nen-data';
+    import QuizResult   from '$lib/components/quiz-result.svelte';
+    import AuraFarm     from '$lib/components/loaders/aura-farm.svelte';
 
 
     let audio               : HTMLAudioElement | null = null;
     let isSoundEffectMuted  = $state( false );
+
 
     type QuizState = 'intro' | 'quiz' | 'calculating' | 'result';
 
@@ -49,7 +57,7 @@
     }
 
 
-    let quizState               = $state< QuizState>('intro' );
+    let quizState               = $state<QuizState>( ( page.url.searchParams.get( 'quizState' ) as QuizState ) || 'intro' );
     let questions               = $state( getQuestionsWithShuffledOptions() );
     let currentQuestionIndex    = $state(0);
     let answers                 = $state<string[]>( [] );
@@ -61,6 +69,17 @@
     const currentQuestion       = $derived( questions[ currentQuestionIndex ] );
     const progress              = $derived((( currentQuestionIndex ) / questions.length ) * 100 );
     const progressAfterAnswer   = $derived((( currentQuestionIndex + 1 ) / questions.length ) * 100 );
+
+    // Sincronizar el quizState con la URL
+    $effect(() => {
+        const currentState = page.url.searchParams.get( 'quizState' );
+
+        if ( currentState !== quizState ) {
+            const url = new URL( window.location.href );
+            url.searchParams.set( 'quizState', quizState );
+            goto( url.toString(), { replaceState: true, noScroll: true });
+        }
+    });
 
 
     function startQuiz() {
@@ -121,7 +140,6 @@
 
 
 <div class="min-h-screen bg-background relative overflow-hidden">
-
     <!-- Intro State -->
     {#if quizState === 'intro'}
         <div class="min-h-screen flex items-center justify-center px-4">
@@ -147,7 +165,7 @@
 
                 <div class="bg-amber-500/10 backdrop-blur-sm rounded-lg p-4 mt-4 mb-4 flex items-center gap-2 mx-auto max-w-lg border border-amber-600/10">
                     <svg xmlns="http://www.w3.org/2000/svg" width="31" height="31" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-info-circle text-amber-500"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0" /><path d="M12 9h.01" /><path d="M11 12h1v4h1" /></svg>
-                    <span class="text-sm text-amber-200">Se reproducirá un sonido de fondo para ayudarte a concentrarte. No dudes en apagarlo si lo deseas.</span>
+                    <span class="text-sm text-amber-200">Se reproducirá una música de fondo para ayudarte a concentrarte. No dudes en apagarlo si lo deseas.</span>
                 </div>
 
                 <div class="space-y-4">
@@ -233,37 +251,9 @@
             <div class="text-center">
                 <!-- Animated hexagon -->
                 <div class="relative w-48 h-48 mx-auto mb-8">
-                    <svg class="w-full h-full animate-spin" style="animation-duration: 3s;" viewBox="0 0 200 200">
-                        <polygon 
-                        points="100,10 180,55 180,145 100,190 20,145 20,55" 
-                        fill="none" 
-                        stroke="url(#gradient)" 
-                        stroke-width="2"
-                        />
-                        <defs>
-                        <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                            <stop offset="0%" stop-color="hsl(45 100% 50%)" />
-                            <stop offset="20%" stop-color="hsl(280 80% 60%)" />
-                            <stop offset="40%" stop-color="hsl(200 90% 55%)" />
-                            <stop offset="60%" stop-color="hsl(330 85% 55%)" />
-                            <stop offset="80%" stop-color="hsl(140 70% 45%)" />
-                            <stop offset="100%" stop-color="hsl(25 95% 55%)" />
-                        </linearGradient>
-                        </defs>
-                    </svg>
-
-                    <!-- Inner pulsing circles -->
-                    <div class="absolute inset-0 flex items-center justify-center">
-                        <div class="w-24 h-24 rounded-full bg-primary/20 aura-pulse"></div>
-                    </div>
-
-                    <div class="absolute inset-0 flex items-center justify-center">
-                        <div class="w-16 h-16 rounded-full bg-primary/30 aura-pulse" style="animation-delay: 0.3s;"></div>
-                    </div>
-
-                    <div class="absolute inset-0 flex items-center justify-center">
-                        <div class="w-8 h-8 rounded-full bg-primary/50 aura-pulse" style="animation-delay: 0.6s;"></div>
-                    </div>
+                    <AuraFarm 
+                        size={1.5}
+                    />
                 </div>
 
                 <video 
