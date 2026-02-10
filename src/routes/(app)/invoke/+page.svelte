@@ -1,5 +1,6 @@
 <script lang="ts">
-    import { onMount } from 'svelte';
+    import { onMount }          from 'svelte';
+    import { page }             from '$app/state';
 
     import { NEN_TYPES }        from '$lib/data/nen-data';
     import { getFallbackHatsu } from '$lib/data/hatsu-data';
@@ -7,38 +8,41 @@
     import AuraButton           from '$lib/components/buttons/aura-button.svelte';
     import { goto }             from '$app/navigation';
     import PulseButton          from '$lib/components/buttons/pulse-button.svelte';
+    import NenCard              from '$lib/components/cards/nen-card.svelte';
+    import GenerateButton       from '$lib/components/buttons/generate-button.svelte';
+    import RepeatIcon           from '$lib/components/icons/RepeatIcon.svelte';
 
 
     type PageState = 'form' | 'invoking' | 'revealed';
 
 
-    let secondaryCode   = $state('EMI');
-    let primaryCode     = $state('INT');
-    let pageState       = $state<PageState>('form');
-    let userIdea        = $state('');
-    let selectedTags    = $state<string[]>([]);
-    let retryCount      = $state(0);
-    let loadingMessage  = $state('Canalizando tu Aura...');
+    let secondaryCode   = $state( 'EMI' );
+    let primaryCode     = $state( 'INT' );
+    let pageState       = $state<PageState>( 'form' );
+    let userIdea        = $state( '' );
+    let selectedTags    = $state<string[]>( [] );
+    let retryCount      = $state( 0 );
+    let loadingMessage  = $state( 'Canalizando tu Aura...' );
     let showRevealPhase = $state( 0 );
     let loading         = $state( false );
     let hatsuResult     = $state<any>( null );
 
 
-    const primary   = $derived(NEN_TYPES[primaryCode as keyof typeof NEN_TYPES] || NEN_TYPES.INT);
-    const secondary = $derived(NEN_TYPES[secondaryCode as keyof typeof NEN_TYPES] || NEN_TYPES.EMI);
+    const primary   = $derived( NEN_TYPES[primaryCode as keyof typeof NEN_TYPES]     || NEN_TYPES.INT );
+    const secondary = $derived( NEN_TYPES[secondaryCode as keyof typeof NEN_TYPES]   || NEN_TYPES.EMI );
 
 
     const combatTags = [
-        { id: 'melee', label: 'Combate cuerpo a cuerpo', icon: '&#9876;' },
-        { id: 'ranged', label: 'Ataques a distancia', icon: '&#127919;' },
-        { id: 'defense', label: 'Defensa y proteccion', icon: '&#128737;' },
-        { id: 'stealth', label: 'Sigilo y espionaje', icon: '&#128065;' },
-        { id: 'support', label: 'Soporte y curacion', icon: '&#10084;' },
-        { id: 'trap', label: 'Trampas y emboscadas', icon: '&#9881;' },
-        { id: 'summon', label: 'Invocaciones', icon: '&#128126;' },
-        { id: 'area', label: 'Control de area', icon: '&#127758;' },
-        { id: 'speed', label: 'Velocidad y agilidad', icon: '&#9889;' },
-        { id: 'mental', label: 'Control mental', icon: '&#129504;' },
+        { id: 'melee',      label: 'Combate cuerpo a cuerpo',   icon: '&#9876;' },
+        { id: 'ranged',     label: 'Ataques a distancia',       icon: '&#127919;' },
+        { id: 'defense',    label: 'Defensa y proteccion',      icon: '&#128737;' },
+        { id: 'stealth',    label: 'Sigilo y espionaje',        icon: '&#128065;' },
+        { id: 'support',    label: 'Soporte y curacion',        icon: '&#10084;' },
+        { id: 'trap',       label: 'Trampas y emboscadas',      icon: '&#9881;' },
+        { id: 'summon',     label: 'Invocaciones',              icon: '&#128126;' },
+        { id: 'area',       label: 'Control de area',           icon: '&#127758;' },
+        { id: 'speed',      label: 'Velocidad y agilidad',      icon: '&#9889;' },
+        { id: 'mental',     label: 'Control mental',            icon: '&#129504;' },
     ];
 
 
@@ -49,53 +53,59 @@
     }
 
 
+    function resetHatsuState() {
+        pageState       = 'form';
+        showRevealPhase = 0;
+        hatsuResult     = null;
+        selectedTags    = [];
+        userIdea        = '';
+
+        // Limpiar localStorage
+        if ( typeof window !== 'undefined' ) {
+            localStorage.removeItem( 'hatsuResult' );
+            localStorage.removeItem( 'userIdea' );
+            localStorage.removeItem( 'selectedTags' );
+        }
+    }
+
+
     const colorClasses: Record<string, string> = {
-        'nen-int': 'bg-nen-int',
-        'nen-tra': 'bg-nen-tra',
-        'nen-mat': 'bg-nen-mat',
-        'nen-esp': 'bg-nen-esp',
-        'nen-man': 'bg-nen-man',
-        'nen-emi': 'bg-nen-emi'
+        'nen-int'   : 'bg-nen-int',
+        'nen-tra'   : 'bg-nen-tra',
+        'nen-mat'   : 'bg-nen-mat',
+        'nen-esp'   : 'bg-nen-esp',
+        'nen-man'   : 'bg-nen-man',
+        'nen-emi'   : 'bg-nen-emi'
     };
 
 
     const textColorClasses: Record<string, string> = {
-        'nen-int': 'text-nen-int',
-        'nen-tra': 'text-nen-tra',
-        'nen-mat': 'text-nen-mat',
-        'nen-esp': 'text-nen-esp',
-        'nen-man': 'text-nen-man',
-        'nen-emi': 'text-nen-emi'
+        'nen-int'   : 'text-nen-int',
+        'nen-tra'   : 'text-nen-tra',
+        'nen-mat'   : 'text-nen-mat',
+        'nen-esp'   : 'text-nen-esp',
+        'nen-man'   : 'text-nen-man',
+        'nen-emi'   : 'text-nen-emi'
     };
 
 
     const borderColorClasses: Record<string, string> = {
-        'nen-int': 'border-nen-int/50',
-        'nen-tra': 'border-nen-tra/50',
-        'nen-mat': 'border-nen-mat/50',
-        'nen-esp': 'border-nen-esp/50',
-        'nen-man': 'border-nen-man/50',
-        'nen-emi': 'border-nen-emi/50'
-    };
-
-
-    const glowClasses: Record<string, string> = {
-        'nen-int': 'glow-nen-int',
-        'nen-tra': 'glow-nen-tra',
-        'nen-mat': 'glow-nen-mat',
-        'nen-esp': 'glow-nen-esp',
-        'nen-man': 'glow-nen-man',
-        'nen-emi': 'glow-nen-emi'
+        'nen-int'   : 'border-nen-int/50',
+        'nen-tra'   : 'border-nen-tra/50',
+        'nen-mat'   : 'border-nen-mat/50',
+        'nen-esp'   : 'border-nen-esp/50',
+        'nen-man'   : 'border-nen-man/50',
+        'nen-emi'   : 'border-nen-emi/50'
     };
 
 
     const nenColorVars: Record<string, string> = {
-        'nen-int': 'hsl(45 100% 50%)',
-        'nen-tra': 'hsl(280 80% 60%)',
-        'nen-mat': 'hsl(200 90% 55%)',
-        'nen-esp': 'hsl(330 85% 55%)',
-        'nen-man': 'hsl(140 70% 45%)',
-        'nen-emi': 'hsl(25 95% 55%)'
+        'nen-int'   : 'hsl(45 100% 50%)',
+        'nen-tra'   : 'hsl(280 80% 60%)',
+        'nen-mat'   : 'hsl(200 90% 55%)',
+        'nen-esp'   : 'hsl(330 85% 55%)',
+        'nen-man'   : 'hsl(140 70% 45%)',
+        'nen-emi'   : 'hsl(25 95% 55%)'
     };
 
     // Función para invocar la habilidad usando Gemini AI
@@ -195,11 +205,61 @@
         }
     }
 
+    // Sincronizar el pageState con la URL
+    $effect(() => {
+        const currentState = page.url.searchParams.get( 'pageState' );
+
+        if ( currentState !== pageState ) {
+            const url = new URL( window.location.href );
+            url.searchParams.set( 'pageState', pageState );
+            goto( url.toString(), { replaceState: true, noScroll: true });
+        }
+    });
+
+    // Guardar hatsuResult en localStorage cuando cambie
+    $effect(() => {
+        if ( typeof window !== 'undefined' && hatsuResult ) {
+            localStorage.setItem( 'hatsuResult', JSON.stringify( hatsuResult ) );
+        }
+    });
+
+    // Guardar userIdea en localStorage cuando cambie
+    $effect(() => {
+        if ( typeof window !== 'undefined' ) {
+            localStorage.setItem( 'userIdea', userIdea );
+        }
+    });
+
+    // Guardar selectedTags en localStorage cuando cambie
+    $effect(() => {
+        if ( typeof window !== 'undefined' ) {
+            localStorage.setItem( 'selectedTags', JSON.stringify( selectedTags ) );
+        }
+    });
+
 
     onMount(() => {
         const params    = new URLSearchParams( window.location.search );
         primaryCode     = params.get( 'primary' ) || 'INT';
         secondaryCode   = params.get( 'secondary' ) || 'EMI';
+
+        // Cargar datos desde localStorage
+        const savedHatsu        = localStorage.getItem( 'hatsuResult' );
+        const savedIdea         = localStorage.getItem( 'userIdea' );
+        const savedTags         = localStorage.getItem( 'selectedTags' );
+        const savedPageState    = params.get( 'pageState' ) as PageState;
+
+        if ( savedHatsu ) {
+            hatsuResult = JSON.parse( savedHatsu );
+            // Si hay un hatsuResult guardado y el pageState es 'revealed', mostrar todo
+            if ( savedPageState === 'revealed' ) {
+                pageState       = 'revealed';
+                showRevealPhase = 6; // Mostrar todas las fases
+            }
+        }
+
+        if ( savedIdea ) userIdea = savedIdea;
+        if ( savedTags ) selectedTags = JSON.parse( savedTags );
     });
 </script>
 
@@ -384,113 +444,93 @@
 
                 <!-- Phase 2: Description -->
                 {#if showRevealPhase >= 2}
-                    <div class="mb-8 animate-fade-in-up">
-                        <div class="p-6 rounded-2xl bg-card border {borderColorClasses[primary.color]} relative overflow-hidden">
-                            <div class="absolute inset-0 {colorClasses[primary.color]}/5"></div>
-
-                            <div class="relative z-10">
-                                <div class="flex items-center gap-2 mb-4">
-                                    <div class="w-1 h-6 rounded-full {colorClasses[primary.color]}"></div>
-                                    <h3 class="text-lg font-bold text-foreground">Descripción de la Habilidad</h3>
-                                </div>
-
-                                <p class="text-foreground/90 leading-relaxed text-base">
-                                    { hatsuResult.description }
-                                </p>
-                            </div>
+                    <NenCard borderColor={primary.color} showGlow={true} class="mb-8 animate-fade-in-up">
+                        <div class="flex items-center gap-2 mb-4">
+                            <div class="w-1 h-6 rounded-full {colorClasses[primary.color]}"></div>
+                            <h3 class="text-lg font-bold text-foreground">Descripción de la Habilidad</h3>
                         </div>
-                    </div>
+
+                        <p class="text-foreground/90 leading-relaxed text-base">
+                            { hatsuResult.description }
+                        </p>
+                    </NenCard>
                 {/if}
 
                 <!-- Phase 3: Combat Style -->
                 {#if showRevealPhase >= 3 && hatsuResult.combat_style}
-                    <div class="mb-8 animate-fade-in-up">
-                        <div class="p-6 rounded-2xl bg-card border {borderColorClasses[secondary.color]} relative overflow-hidden">
-                            <div class="absolute inset-0 {colorClasses[secondary.color]}/5"></div>
-
-                            <div class="relative z-10">
-                                <div class="flex items-center gap-2 mb-4">
-                                    <div class="w-1 h-6 rounded-full {colorClasses[secondary.color]}"></div>
-                                    <h3 class="text-lg font-bold text-foreground">Estilo de Combate</h3>
-                                </div>
-
-                                <p class="text-foreground/90 leading-relaxed">
-                                    { hatsuResult.combat_style }
-                                </p>
-                            </div>
+                    <NenCard borderColor={secondary.color} showGlow={true} class="mb-8 animate-fade-in-up">
+                        <div class="flex items-center gap-2 mb-4">
+                            <div class="w-1 h-6 rounded-full {colorClasses[secondary.color]}"></div>
+                            <h3 class="text-lg font-bold text-foreground">Estilo de Combate</h3>
                         </div>
-                    </div>
+
+                        <p class="text-foreground/90 leading-relaxed">
+                            { hatsuResult.combat_style }
+                        </p>
+                    </NenCard>
                 {/if}
 
                 <!-- Phase 4: Conditions and Vows -->
                 {#if showRevealPhase >= 4 && hatsuResult.conditions_and_vows}
-                    <div class="mb-8 animate-fade-in-up">
-                        <div class="p-6 rounded-2xl bg-card border border-destructive/30 relative overflow-hidden">
-                            <div class="absolute inset-0 bg-destructive/5"></div>
-
-                            <div class="relative z-10">
-                                <div class="flex items-center gap-2 mb-4">
-                                    <div class="w-1 h-6 rounded-full bg-destructive"></div>
-                                    <h3 class="text-lg font-bold text-foreground">Condiciones y Juramentos</h3>
-                                </div>
-
-                                <div class="space-y-3">
-                                    {#each hatsuResult.conditions_and_vows as condition, index}
-                                        <div class="flex gap-3">
-                                            <span class="text-destructive font-bold text-sm mt-0.5">{index + 1}.</span>
-
-                                            <p class="text-foreground/90 leading-relaxed flex-1">
-                                                { condition }
-                                            </p>
-                                        </div>
-                                    {/each}
-                                </div>
-
-                                <p class="text-sm text-muted-foreground mt-4 pt-4 border-t border-border">
-                                    En el mundo del Nen, las restricciones más severas otorgan el mayor poder. Tus juramentos son el precio de tu fuerza.
-                                </p>
-                            </div>
+                    <NenCard borderColor="nen-esp" showGlow={false} class="mb-8 animate-fade-in-up">
+                        <div class="flex items-center gap-2 mb-4">
+                            <div class="w-1 h-6 rounded-full bg-destructive"></div>
+                            <h3 class="text-lg font-bold text-foreground">Condiciones y Juramentos</h3>
                         </div>
-                    </div>
+
+                        <div class="space-y-3">
+                            {#each hatsuResult.conditions_and_vows as condition, index}
+                                <div class="flex gap-3">
+                                    <span class="text-destructive font-bold text-sm mt-0.5">{index + 1}.</span>
+
+                                    <p class="text-foreground/90 leading-relaxed flex-1">
+                                        { condition }
+                                    </p>
+                                </div>
+                            {/each}
+                        </div>
+
+                        <p class="text-sm text-muted-foreground mt-4 pt-4 border-t border-border">
+                            En el mundo del Nen, las restricciones más severas otorgan el mayor poder. Tus juramentos son el precio de tu fuerza.
+                        </p>
+                    </NenCard>
                 {/if}
 
                 <!-- Phase 5: Usage Example -->
                 {#if showRevealPhase >= 5 && hatsuResult.usage_example}
-                    <div class="mb-8 animate-fade-in-up">
-                        <div class="p-6 rounded-2xl bg-card border border-border relative overflow-hidden">
-                            <div class="absolute inset-0 bg-muted/5"></div>
+                    <NenCard borderColor={primary.color} showGlow={false} class="mb-8 animate-fade-in-up">
+                        <div class="flex items-center gap-2 mb-4">
+                            <div class="w-1 h-6 rounded-full bg-primary"></div>
 
-                            <div class="relative z-10">
-                                <div class="flex items-center gap-2 mb-4">
-                                    <div class="w-1 h-6 rounded-full bg-primary"></div>
-                                    <h3 class="text-lg font-bold text-foreground">Ejemplo de Uso en Combate</h3>
-                                </div>
-
-                                <p class="text-foreground/90 leading-relaxed italic">
-                                    { hatsuResult.usage_example }
-                                </p>
-                            </div>
+                            <h3 class="text-lg font-bold text-foreground">Ejemplo de Uso en Combate</h3>
                         </div>
-                    </div>
+
+                        <p class="text-foreground/90 leading-relaxed italic">
+                            { hatsuResult.usage_example }
+                        </p>
+                    </NenCard>
                 {/if}
 
                 <!-- Phase 6: Actions -->
                 {#if showRevealPhase >= 6}
                     <div class="flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-in-up">
-                        <PulseButton text="Repetir el Test" onClick={() => goto('/quiz')} />
+                        <PulseButton
+                            text    = "Repetir el Test"
+                            onClick = { () => goto('/quiz') }
+                        >
+                            <RepeatIcon />
+                        </PulseButton>
 
                         <AuraButton
-                            text="Invocar otra Habilidad"
-                            onclick={() => { pageState = 'form'; showRevealPhase = 0; hatsuResult = null; selectedTags = []; userIdea = ''; }}
-                            primaryColor={primary.color}
+                            text            = "Invocar otra Habilidad"
+                            onclick         = { resetHatsuState }
+                            primaryColor    = { primary.color }
                         />
 
-                        <a
-                            href="/"
-                            class="px-6 py-3 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-all hover:scale-105"
-                        >
-                            Explorar más sobre el Nen
-                        </a>
+                        <GenerateButton
+                            onclick = { resetHatsuState }
+                            text    = "Explorar más sobre el Nen"
+                        />
                     </div>
                 {/if}
             </div>
