@@ -13,7 +13,7 @@
     ];
 
     onMount(() => {
-        const newParticles = Array.from({ length: 100 }, () => ({
+        const newParticles = Array.from({ length: 200 }, () => ({
             id          : Math.random(),
             x           : Math.random() * 100,
             y           : Math.random() * 100,
