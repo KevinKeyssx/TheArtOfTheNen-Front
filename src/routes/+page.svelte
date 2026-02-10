@@ -1,9 +1,15 @@
 <script lang="ts">
-    import { NEN_TYPES, BASIC_NEN_TECHNIQUES, ADVANCED_NEN_TECHNIQUES } from '$lib/data/nen-data';
-    import NenHexagon from '$lib/components/nen-hexagon.svelte';
-    import NenTypeCard from '$lib/components/nen-type-card.svelte';
-    import TechniqueCard from '$lib/components/technique-card.svelte';
-    import Aura from '../lib/components/Aura.svelte';
+    import {
+        NEN_TYPES,
+        BASIC_NEN_TECHNIQUES,
+        ADVANCED_NEN_TECHNIQUES
+    }                       from '$lib/data/nen-data';
+    import NenHexagon       from '$lib/components/nen-hexagon.svelte';
+    import NenTypeCard      from '$lib/components/nen-type-card.svelte';
+    import TechniqueCard    from '$lib/components/technique-card.svelte';
+    import Aura             from '$lib/components/Aura.svelte';
+    import PulseButton      from '$lib/components/buttons/pulse-button.svelte';
+    import MagicButton      from '$lib/components/buttons/MagicButton.svelte';
 
 
     const nenTypesArray = Object.values(NEN_TYPES);
@@ -79,18 +85,12 @@
         </p>
         
         <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <button 
-            onclick={() => scrollToSection('tipos')} 
-            class="px-6 py-3 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-all hover:scale-105"
-            >
-            Explorar el Nen
-            </button>
-            <a 
-            href="/quiz" 
-            class="px-6 py-3 border border-primary text-primary rounded-lg font-medium hover:bg-primary/10 transition-all hover:scale-105"
-            >
-            Descubre tu Tipo
-            </a>
+            <PulseButton
+                text="Explorar el Nen"
+                onClick={() => scrollToSection('tipos')}
+            />
+
+            <MagicButton />
         </div>
         </div>
         
