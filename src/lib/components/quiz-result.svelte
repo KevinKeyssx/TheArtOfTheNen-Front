@@ -2,12 +2,35 @@
     import { onMount }  from 'svelte';
     import { goto }     from '$app/navigation';
 
+        import {
+        Chart,
+        RadarController,
+        RadialLinearScale,
+        PointElement,
+        LineElement,
+        Filler,
+        Tooltip,
+        Legend
+    }                   from 'chart.js';
+    import { toPng }    from 'html-to-image';
+
     import type { NEN_TYPES }   from '$lib/data/nen-data';
-    import GenerateButton       from '$lib/components/buttons/generate-button.svelte';
     import PulseButton          from '$lib/components/buttons/pulse-button.svelte';
     import ShareButton          from '$lib/components/buttons/share-button.svelte';
-  import AuraButton from './buttons/aura-button.svelte';
+    import AuraButton           from '$lib/components/buttons/aura-button.svelte';
+    import NenCard              from '$lib/components/cards/nen-card.svelte';
+    import RepeatIcon           from '$lib/components/icons/RepeatIcon.svelte';
 
+
+    Chart.register(
+        RadarController,
+        RadialLinearScale,
+        PointElement,
+        LineElement,
+        Filler,
+        Tooltip,
+        Legend
+    );
 
     type NenType = ( typeof NEN_TYPES )[keyof typeof NEN_TYPES];
 
@@ -20,10 +43,6 @@
     };
 
     let { result, onRestart }: { result: Result; onRestart: () => void } = $props();
-    let showContent     = $state( false );
-    let showPrimary     = $state( false );
-    let showSecondary   = $state( false );
-    let showDetails     = $state( false );
     let showShareDialog = $state( false );
     let copySuccess     = $state( false );
 
@@ -63,219 +82,341 @@
     }
 
     function toggleShareDialog() {
-        showShareDialog = !showShareDialog;
+        // showShareDialog = !showShareDialog;
+        shareAsImage();
     }
 
     const colorClasses: Record<string, string> = {
-        'nen-int': 'bg-nen-int',
-        'nen-tra': 'bg-nen-tra',
-        'nen-mat': 'bg-nen-mat',
-        'nen-esp': 'bg-nen-esp',
-        'nen-man': 'bg-nen-man',
-        'nen-emi': 'bg-nen-emi'
+        'nen-int'   : 'bg-nen-int',
+        'nen-tra'   : 'bg-nen-tra',
+        'nen-mat'   : 'bg-nen-mat',
+        'nen-esp'   : 'bg-nen-esp',
+        'nen-man'   : 'bg-nen-man',
+        'nen-emi'   : 'bg-nen-emi'
     };
+
 
     const textColorClasses: Record<string, string> = {
-        'nen-int': 'text-nen-int',
-        'nen-tra': 'text-nen-tra',
-        'nen-mat': 'text-nen-mat',
-        'nen-esp': 'text-nen-esp',
-        'nen-man': 'text-nen-man',
-        'nen-emi': 'text-nen-emi'
+        'nen-int'   : 'text-nen-int',
+        'nen-tra'   : 'text-nen-tra',
+        'nen-mat'   : 'text-nen-mat',
+        'nen-esp'   : 'text-nen-esp',
+        'nen-man'   : 'text-nen-man',
+        'nen-emi'   : 'text-nen-emi'
     };
 
-    const glowClasses: Record<string, string> = {
-        'nen-int': 'glow-nen-int',
-        'nen-tra': 'glow-nen-tra',
-        'nen-mat': 'glow-nen-mat',
-        'nen-esp': 'glow-nen-esp',
-        'nen-man': 'glow-nen-man',
-        'nen-emi': 'glow-nen-emi'
-    };
 
     const borderColorClasses: Record<string, string> = {
-        'nen-int': 'border-nen-int/50',
-        'nen-tra': 'border-nen-tra/50',
-        'nen-mat': 'border-nen-mat/50',
-        'nen-esp': 'border-nen-esp/50',
-        'nen-man': 'border-nen-man/50',
-        'nen-emi': 'border-nen-emi/50'
+        'nen-int'   : 'border-nen-int/50',
+        'nen-tra'   : 'border-nen-tra/50',
+        'nen-mat'   : 'border-nen-mat/50',
+        'nen-esp'   : 'border-nen-esp/50',
+        'nen-man'   : 'border-nen-man/50',
+        'nen-emi'   : 'border-nen-emi/50'
     };
 
-    const nenColorVars: Record<string, string> = {
-        'nen-int': 'hsl(45 100% 50%)',
-        'nen-tra': 'hsl(280 80% 60%)',
-        'nen-mat': 'hsl(200 90% 55%)',
-        'nen-esp': 'hsl(330 85% 55%)',
-        'nen-man': 'hsl(140 70% 45%)',
-        'nen-emi': 'hsl(25 95% 55%)'
-    };
+    let chartCanvas = $state<HTMLCanvasElement>();
+    let chartInstance: Chart | null = null;
 
     onMount(() => {
-        // Staggered reveal
-        setTimeout( () => showContent = true, 200 );
-        setTimeout( () => showPrimary = true, 800 );
-        setTimeout( () => showSecondary = true, 1500 );
-        setTimeout( () => showDetails = true, 2200 );
+        // Chart initialization
+        // Pequeño timeout para asegurar que el canvas tenga dimensiones correctas antes de renderizar
+        setTimeout(() => {
+            if ( chartCanvas ) {
+                // Orden estándar del hexágono: INT -> TRA -> MAT -> ESP -> MAN -> EMI
+                const labels = [ 'Intensificación', 'Transmutación', 'Materialización', 'Especialización', 'Manipulación', 'Emisión' ];
+                const dataOrder = [ 'INT', 'TRA', 'MAT', 'ESP', 'MAN', 'EMI' ];
+                const data = dataOrder.map( code => result.scores[code] || 0 );
+
+                // Determinar colores basados en el tipo principal
+                const primaryColorClass = result.primary.color; // ej: 'nen-int'
+                // Mapa rápido de colores hexadecimales para el gráfico (ya que chart.js no usa clases tailwind directamente)
+                const colorMap: Record<string, string> = {
+                    'nen-int': '#facc15', // yellow-400
+                    'nen-tra': '#a855f7', // purple-500
+                    'nen-mat': '#3b82f6', // blue-500
+                    'nen-esp': '#ec4899', // pink-500
+                    'nen-man': '#22c55e', // green-500
+                    'nen-emi': '#f97316'  // orange-500
+                };
+
+                // Array de colores correspondiente al orden de los datos
+                const pointColors = [
+                    colorMap['nen-int'], // Intensificación
+                    colorMap['nen-tra'], // Transmutación
+                    colorMap['nen-mat'], // Materialización
+                    colorMap['nen-esp'], // Especialización
+                    colorMap['nen-man'], // Manipulación
+                    colorMap['nen-emi']  // Emisión
+                ];
+
+                const mainColor = colorMap[primaryColorClass] || '#ffffff';
+
+                chartInstance = new Chart(chartCanvas, {
+                    type: 'radar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Afinidad de Aura',
+                            data: data,
+                            fill: true,
+                            backgroundColor: `${mainColor}33`, // 20% opacity del tipo principal
+                            borderColor: mainColor,
+                            borderWidth: 2,
+                            // Puntos multicolores
+                            pointBackgroundColor: pointColors, 
+                            pointBorderColor: '#fff',
+                            pointBorderWidth: 2,
+                            pointHoverBackgroundColor: '#fff',
+                            pointHoverBorderColor: pointColors,
+                            pointRadius: 5,
+                            pointHoverRadius: 7
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            r: {
+                                min: 0,
+                                max: 7, // Fijamos el máximo en 7 para que la escala sea absoluta y correcta
+                                beginAtZero: true,
+                                angleLines: {
+                                    color: 'rgba(255, 255, 255, 0.1)'
+                                },
+                                grid: {
+                                    color: 'rgba(255, 255, 255, 0.1)',
+                                    circular: false // Líneas rectas (hexagonal) para ser fiel al diagrama original de Nen
+                                },
+                                pointLabels: {
+                                    // Etiquetas multicolores usando callback para evitar error de tipos
+                                    color: (context) => pointColors[context.index],
+                                    font: {
+                                        size: 13,
+                                        family: "'Arial', sans-serif",
+                                        weight: 'bold'
+                                    },
+                                    backdropPadding: 10
+                                },
+                                ticks: {
+                                    display: false,
+                                    backdropColor: 'transparent'
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            titleColor: '#fff',
+                            bodyColor: '#fff',
+                            borderColor: 'rgba(255, 255, 255, 0.1)',
+                            borderWidth: 1,
+                            padding: 10,
+                            displayColors: false,
+                            callbacks: {
+                                label: function(context) {
+                                    return `Puntos: ${context.raw}`;
+                                }
+                            }
+                        }
+                        }
+                    }
+                });
+            }
+        }, 100);
+
+        return () => {
+            if (chartInstance) {
+                chartInstance.destroy();
+            }
+        };
     });
+
+
+
+
+    async function shareAsImage() {
+        const elementToCapture = document.getElementById('hatsu-share-card');
+
+        if (!elementToCapture) {
+            console.error("No se encontró el elemento");
+            return;
+        }
+
+        try {
+            // TRUCO: A veces las fuentes tardan en cargar y la imagen sale con texto Times New Roman.
+            // Esperamos un micro-segundo o aseguramos carga.
+            
+            // 1. Generar la imagen usando html-to-image
+            // filter: ignora elementos que no quieras en la foto (como botones de control si los hubiera)
+            const dataUrl = await toPng(elementToCapture, { 
+                cacheBust: true,
+                backgroundColor: '#0c0e12', // Forzamos un color de fondo por si acaso es transparente
+                style: {
+                    transform: 'scale(1)', // Asegura que no se deforme
+                }
+            });
+
+            // 2. Usar Web Share API
+            if (navigator.share) {
+                const blob = await (await fetch(dataUrl)).blob();
+                const file = new File([blob], `mi-hatsu-${result.primary.name}.png`, { type: 'image/png' });
+
+                try {
+                    await navigator.share({
+                        title: 'Mi Habilidad Nen',
+                        text: `Soy un usuario de ${result.primary.name} en Hunter x Hunter. ¡Descubre tu tipo!`,
+                        files: [file]
+                    });
+                } catch (shareError) {
+                    console.log('Compartir cancelado');
+                }
+            } else {
+                // Fallback Escritorio
+                const link = document.createElement('a');
+                link.download = `mi-hatsu-${result.primary.name}.png`;
+                link.href = dataUrl;
+                link.click();
+            }
+
+        } catch (error) {
+            console.error('Error generando la imagen:', error);
+            alert("No pudimos generar la imagen. Intenta tomar una captura de pantalla.");
+        }
+    }
 </script>
 
 <div class="min-h-screen flex items-center justify-center px-4 py-10 relative">
     <!-- Large background glow -->
-    {#if showPrimary}
-        <div 
-            class="fixed top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full opacity-20 blur-3xl transition-opacity duration-1000 {colorClasses[result.primary.color]}"
-        ></div>
-    {/if}
+    <div 
+        class="fixed top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full opacity-0 blur-3xl animate-fade-in {colorClasses[result.primary.color]}/20"
+        style="animation-delay: 800ms; animation-fill-mode: both;"
+    ></div>
 
-    <div class="max-w-3xl mx-auto w-full relative z-10 space-y-6">
-        {#if showContent}
-            <div class="text-center animate-fade-in-up">
-                <h1 class="text-2xl sm:text-3xl font-bold text-foreground mb-2">Tu Tipo de Nen ha sido Revelado</h1>
+    <div  class="max-w-4xl mx-auto w-full relative z-10 space-y-6">
+        <!-- !HTML2Canvas -->
+        <div id="hatsu-share-card" class="space-y-6  px-18 py-4">
 
-                <!-- <p class="text-muted-foreground">Basado en tus respuestas, este es tu perfil de aura</p> -->
-            </div>
-        {/if}
+        <div class="text-center opacity-0 animate-fade-in-up" style="animation-delay: 200ms; animation-fill-mode: both;">
+            <h1 class="text-2xl sm:text-3xl font-bold text-foreground mb-2">Tu Tipo de Nen ha sido Revelado</h1>
+
+            <!-- <p class="text-muted-foreground">Basado en tus respuestas, este es tu perfil de aura</p> -->
+        </div>
 
         <!-- Primary Type -->
-        {#if showPrimary}
-            <div class="animate-reveal">
-                <div class="p-8 rounded-2xl border {borderColorClasses[result.primary.color]} {glowClasses[result.primary.color]} relative overflow-hidden backdrop-blur-sm"
-                    style="background: linear-gradient(135deg, {nenColorVars[result.primary.color]}08, {nenColorVars[result.primary.color]}15, {nenColorVars[result.primary.color]}08);"
-                >
-                    <!-- Animated gradient overlay -->
-                    <div class="absolute inset-0 opacity-30" style="background: radial-gradient(circle at 50% 50%, {nenColorVars[result.primary.color]}20 0%, transparent 70%);"></div>
-                    
-                    <!-- Subtle pattern -->
-                    <div class="absolute inset-0 opacity-5" style="background-image: radial-gradient(circle at 2px 2px, {nenColorVars[result.primary.color]} 1px, transparent 0); background-size: 32px 32px;"></div>
+        <!-- <div class="opacity-0 animate-reveal" style="animation-delay: 800ms; animation-fill-mode: both;"> -->
+        <div>
+            <NenCard borderColor={result.primary.color} showGlow={true}>
+                <div class="flex items-center justify-center gap-2 mb-4">
+                    <span class="px-3 py-1 text-sm font-medium rounded-full {colorClasses[result.primary.color]}/20 {textColorClasses[result.primary.color]}">
+                        Tipo Principal
+                    </span>
+                </div>
 
-                    <div class="relative z-10">
-                        <div class="flex items-center justify-center gap-2 mb-4">
-                            <span class="px-3 py-1 text-sm font-medium rounded-full {colorClasses[result.primary.color]}/20 {textColorClasses[result.primary.color]}">
-                                Tipo Principal
+                <!-- <div class="flex flex-col items-center mb-6"> -->
+                    <!-- <div class="w-24 h-24 rounded-full {colorClasses[result.primary.color]}/30 flex items-center justify-center mb-4 relative">
+                        <div class="absolute inset-0 rounded-full {colorClasses[result.primary.color]}/20 aura-pulse"></div>
+                        <div class="w-16 h-16 rounded-full {colorClasses[result.primary.color]} aura-pulse"></div>
+                    </div> -->
+
+                    <!-- <h2 class="text-3xl text-center mb-4 sm:text-4xl font-bold {textColorClasses[result.primary.color]} mb-2"> -->
+                    <h2 class="text-3xl text-center mb-4 sm:text-4xl font-bold">
+                        {result.primary.name}
+                    </h2>
+                    <!-- <p class="text-sm text-muted-foreground">{result.primary.fullName}</p> -->
+                <!-- </div> -->
+
+                <video 
+                    src="/videos/{result.primary.name}.mp4" 
+                    autoplay 
+                    loop 
+                    muted 
+                    playsinline
+                    class="rounded-lg shadow-lg mx-auto mb-6 max-w-xs w-full"
+                >
+                    Tu navegador no soporta videos.
+                </video>
+
+                <p class="text-center text-zinc-200 max-w-xl mx-auto mb-2">
+                    {result.primary.test.action}
+                </p>
+
+                <p class="text-center text-zinc-400 max-w-xl mx-auto mb-4 text-[13px]">
+                    { result.primary.test.description }
+                </p>
+
+                <p class="text-center text-zinc-300 max-w-xl mx-auto mb-4">
+                    {result.primary.longDescription}
+                </p>
+
+                <div class="flex flex-wrap justify-center gap-2">
+                    {#each result.primary.characters as character}
+                        <span class="px-3 py-1 text-sm rounded-full {colorClasses[result.primary.color]}/10 {textColorClasses[result.primary.color]} border {borderColorClasses[result.primary.color]}">
+                            {character}
+                        </span>
+                    {/each}
+                </div>
+            </NenCard>
+        </div>
+
+        <!-- Secondary Type -->
+        <!-- <div class="opacity-0 animate-fade-in-up" style="animation-delay: 1500ms; animation-fill-mode: both;"> -->
+            <NenCard borderColor={result.secondary.color} showGlow={true}>
+                <div class="flex items-center gap-4">
+                    <div class="w-16 h-16 rounded-full {colorClasses[result.secondary.color]}/20 flex items-center justify-center shrink-0">
+                        <div class="w-10 h-10 rounded-full {colorClasses[result.secondary.color]} aura-pulse"></div>
+                    </div>
+
+                    <div class="flex-1">
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="px-2 py-0.5 text-xs font-medium rounded-full {colorClasses[result.secondary.color]}/20 {textColorClasses[result.secondary.color]}">
+                                Tipo Secundario
                             </span>
                         </div>
 
-                        <!-- <div class="flex flex-col items-center mb-6"> -->
-                            <!-- <div class="w-24 h-24 rounded-full {colorClasses[result.primary.color]}/30 flex items-center justify-center mb-4 relative">
-                                <div class="absolute inset-0 rounded-full {colorClasses[result.primary.color]}/20 aura-pulse"></div>
-                                <div class="w-16 h-16 rounded-full {colorClasses[result.primary.color]} aura-pulse"></div>
-                            </div> -->
+                        <h3 class="text-xl font-bold {textColorClasses[result.secondary.color]}">
+                            {result.secondary.name}
+                        </h3>
 
-                            <h2 class="text-3xl text-center mb-4 sm:text-4xl font-bold {textColorClasses[result.primary.color]} mb-2">
-                                {result.primary.name}
-                            </h2>
-                            <!-- <p class="text-sm text-muted-foreground">{result.primary.fullName}</p> -->
-                        <!-- </div> -->
-
-                        <video 
-                            src="/videos/{result.primary.name}.mp4" 
-                            autoplay 
-                            loop 
-                            muted 
-                            playsinline
-                            class="rounded-lg shadow-lg mx-auto mb-6 max-w-xs w-full"
-                        >
-                            Tu navegador no soporta videos.
-                        </video>
-
-                        <p class="text-center text-zinc-200 max-w-xl mx-auto mb-2">
-                            {result.primary.test.action}
-                        </p>
-
-                        <p class="text-center text-zinc-400 max-w-xl mx-auto mb-4 text-[13px]">
-                            { result.primary.test.description }
-                        </p>
-
-                        <p class="text-center text-zinc-300 max-w-xl mx-auto mb-4">
-                            {result.primary.longDescription}
-                        </p>
-
-                        <div class="flex flex-wrap justify-center gap-2">
-                            {#each result.primary.characters as character}
-                                <span class="px-3 py-1 text-sm rounded-full {colorClasses[result.primary.color]}/10 {textColorClasses[result.primary.color]} border {borderColorClasses[result.primary.color]}">
-                                    {character}
-                                </span>
-                            {/each}
-                        </div>
+                        <p class="text-sm text-muted-foreground">{result.secondary.description}</p>
                     </div>
                 </div>
-            </div>
-        {/if}
+            </NenCard>
+        <!-- </div> -->
 
-        <!-- Secondary Type -->
-        {#if showSecondary}
-            <div class="animate-fade-in-up">
-                <div class="p-6 rounded-xl border {borderColorClasses[result.secondary.color]} relative overflow-hidden backdrop-blur-sm"
-                    style="background: linear-gradient(135deg, {nenColorVars[result.secondary.color]}05, {nenColorVars[result.secondary.color]}12, {nenColorVars[result.secondary.color]}05);"
-                >
-                    <!-- Subtle glow -->
-                    <div class="absolute inset-0 opacity-20" style="background: radial-gradient(circle at 30% 50%, {nenColorVars[result.secondary.color]}15 0%, transparent 60%);"></div>
-                    
-                    <div class="relative z-10">
-                        <div class="flex items-center gap-4">
-                            <div class="w-16 h-16 rounded-full {colorClasses[result.secondary.color]}/20 flex items-center justify-center shrink-0">
-                                <div class="w-10 h-10 rounded-full {colorClasses[result.secondary.color]} aura-pulse"></div>
-                            </div>
+        <!-- Score Breakdown (Radar Chart) -->
 
-                            <div class="flex-1">
-                                <div class="flex items-center gap-2 mb-1">
-                                    <span class="px-2 py-0.5 text-xs font-medium rounded-full {colorClasses[result.secondary.color]}/20 {textColorClasses[result.secondary.color]}">
-                                        Tipo Secundario
-                                    </span>
-                                </div>
 
-                                <h3 class="text-xl font-bold {textColorClasses[result.secondary.color]}">
-                                    {result.secondary.name}
-                                </h3>
+        <!-- <div class="opacity-0 animate-fade-in-up" style="animation-delay: 2200ms; animation-fill-mode: both;"> -->
+            <NenCard borderColor={result.primary.color} showGlow={false}>
+                <!-- <div> -->
+                <!-- <div class="p-6 rounded-xl border border-border relative overflow-hidden backdrop-blur-sm" style="background: linear-gradient( 135deg, hsl( var( --card ) )95, hsl( var( --card ) ) );">   -->
+                    <!-- <h3 class="text-lg font-bold text-foreground mb-4 relative z-10 text-center">Distribución de tu Aura</h3> -->
 
-                                <p class="text-sm text-muted-foreground">{result.secondary.description}</p>
-                            </div>
-                        </div>
+                    <div class="relative w-full h-[300px] sm:h-[400px] flex items-center justify-center">
+                        <canvas bind:this={chartCanvas}></canvas>
                     </div>
-                </div>
-            </div>
-        {/if}
 
-        <!-- Score Breakdown -->
-        {#if showDetails}
-            <div class="animate-fade-in-up">
-                <div class="p-6 rounded-xl border border-border relative overflow-hidden backdrop-blur-sm" style="background: linear-gradient(135deg, hsl(var(--card))95, hsl(var(--card)));">  
-                    <!-- Subtle animated gradient -->
-                    <div class="absolute inset-0 opacity-10" style="background: linear-gradient(45deg, transparent 30%, {nenColorVars[result.primary.color]}20 50%, transparent 70%); animation: shimmer 3s ease-in-out infinite;"></div>
-                    
-                    <h3 class="text-lg font-bold text-foreground mb-4 relative z-10">Distribucion de tu Aura</h3>
+                    <!-- Leyenda opcional o detalles adicionales si se desea, por ahora solo el gráfico es suficiente y muy visual -->
+                <!-- </div> -->
+            <!-- </div> -->
+            </NenCard>
+           
+        <!-- </div> -->
 
-                    <div class="space-y-3">
-                        {#each result.sortedScores as [code, score], index}
-                            {@const maxScore = result.sortedScores[0][1]}
-                            {@const percentage = maxScore > 0 ? (score / 7) * 100 : 0}
-                            {@const nenType = code as 'INT' | 'TRA' | 'MAT' | 'ESP' | 'MAN' | 'EMI'}
-                            {@const colorKey = nenType === 'INT' ? 'nen-int' : nenType === 'TRA' ? 'nen-tra' : nenType === 'MAT' ? 'nen-mat' : nenType === 'ESP' ? 'nen-esp' : nenType === 'MAN' ? 'nen-man' : 'nen-emi'}
+       
+        </div>
 
-                            <div class="flex items-center gap-3">
-                                <span class="w-24 text-sm text-muted-foreground">
-                                    {nenType === 'INT' ? 'Intensificacion' : nenType === 'TRA' ? 'Transmutacion' : nenType === 'MAT' ? 'Materializacion' : nenType === 'ESP' ? 'Especializacion' : nenType === 'MAN' ? 'Manipulacion' : 'Emision'}
-                                </span>
-
-                                <div class="flex-1 h-3 bg-secondary rounded-full overflow-hidden">
-                                    <div 
-                                        class="h-full {colorClasses[colorKey]} rounded-full transition-all duration-1000 ease-out"
-                                        style="width: {percentage}%; animation-delay: {index * 0.1}s;"
-                                    ></div>
-                                </div>
-
-                                <span class="w-8 text-sm font-medium {textColorClasses[colorKey]}">{score}</span>
-                            </div>
-                        {/each}
-                    </div>
-                </div>
-            </div>
-
-            <!-- Actions -->
-            <div class="flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-in-up flex-wrap">
+        <!-- Actions -->
+        <div class="opacity-0 animate-fade-in-up" style="animation-delay: 2800ms; animation-fill-mode: both;">
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mt-6 flex-wrap">
                 <!-- Botón de repetir -->
-                <PulseButton text="Repetir el Test" onClick={onRestart} />
+                <PulseButton text="Repetir el Test" onClick={onRestart} >
+                    <RepeatIcon />
+                </PulseButton>
 
                 <!-- Botón de invocar habilidad -->
                 <AuraButton
@@ -285,16 +426,16 @@
                 />
 
                 <!-- Botón de Compartir -->
-                <ShareButton />
+                <ShareButton onClick={() => toggleShareDialog()} text="Compartir Resultado" />
             </div>
-        {/if}
+        </div>
     </div>
 </div>
 
 <!-- Diálogo de Compartir -->
 {#if showShareDialog}
     <div 
-        class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in"
+        class="fixed inset-0 bg-black/20 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in"
         onclick={toggleShareDialog}
         onkeydown={( e ) => e.key === 'Escape' && toggleShareDialog()}
         role="dialog"
@@ -303,7 +444,7 @@
         tabindex="-1"
     >
         <div 
-            class="bg-card border border-border rounded-2xl p-6 max-w-md w-full shadow-2xl animate-scale-in"
+            class="bg-card/50 border border-border rounded-2xl p-6 max-w-md w-full shadow-2xl animate-scale-in"
             onclick={( e ) => e.stopPropagation()}
             onkeydown={( e ) => e.stopPropagation()}
             role="presentation"
