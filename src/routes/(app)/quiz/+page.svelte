@@ -5,9 +5,10 @@
     import {
         getRandomQuestions,
         calculateNenResult
-    }                   from '$lib/data/nen-data';
-    import QuizResult   from '$lib/components/quiz-result.svelte';
-    import AuraFarm     from '$lib/components/loaders/aura-farm.svelte';
+    }                       from '$lib/data/nen-data';
+    import QuizResult       from '$lib/components/quiz-result.svelte';
+    import AuraFarm         from '$lib/components/loaders/aura-farm.svelte';
+    import GenerateButton   from '$lib/components/buttons/generate-button.svelte';
 
 
     let audio               : HTMLAudioElement | null = null;
@@ -163,18 +164,29 @@
                     en el mundo de Hunter x Hunter.
                 </p>
 
-                <div class="bg-amber-500/10 backdrop-blur-sm rounded-lg p-4 mt-4 mb-4 flex items-center gap-2 mx-auto max-w-lg border border-amber-600/10">
+                <!-- <div class="bg-blue-700/10 backdrop-blur-sm rounded-lg p-4 mt-4 mb-4 flex items-center gap-2 mx-auto max-w-lg border border-amber-600/10"> -->
+                <div class="bg-amber-800/10 backdrop-blur-sm rounded-lg p-4 mt-4 mb-4 flex items-center gap-2 mx-auto max-w-lg border border-amber-600/10">
                     <svg xmlns="http://www.w3.org/2000/svg" width="31" height="31" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-info-circle text-amber-500"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0" /><path d="M12 9h.01" /><path d="M11 12h1v4h1" /></svg>
-                    <span class="text-sm text-amber-200">Se reproducirá una música de fondo para ayudarte a concentrarte. No dudes en apagarlo si lo deseas.</span>
+                    <span class="text-sm text-zinc-200">Se reproducirá una música de fondo para ayudarte a concentrarte. No dudes en apagarlo si lo deseas.</span>
                 </div>
 
-                <div class="space-y-4">
-                    <button 
+                <!-- <NenCard>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="31" height="31" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-info-circle text-amber-500"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0" /><path d="M12 9h.01" /><path d="M11 12h1v4h1" /></svg>
+                    <span class="text-sm text-amber-200">Se reproducirá una música de fondo para ayudarte a concentrarte. No dudes en apagarlo si lo deseas.</span>
+                </NenCard> -->
+
+                <div class="space-y-4 flex flex-col items-center">
+                    <!-- <button 
                         onclick={startQuiz}
                         class="px-8 py-4 bg-primary text-primary-foreground rounded-lg font-medium text-lg hover:bg-primary/90 transition-all hover:scale-105"
                     >
                         Comenzar el Test
-                    </button>
+                    </button> -->
+
+                    <GenerateButton
+                        text="Comenzar el Test"
+                        onclick={startQuiz}
+                    />
 
                     <p class="text-sm text-muted-foreground">
                         El test toma aproximadamente 2-3 minutos
