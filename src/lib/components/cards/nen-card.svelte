@@ -1,13 +1,21 @@
 <script lang="ts">
     let {
-        borderColor = 'nen-int',
-        showGlow    = false,
-        class: className = '',
+        borderColor         = 'nen-int',
+        showGlow            = false,
+        showAura            = false,
+        animate             = 'animate-zoom-in',
+        duration            = 'animate-duration-1000',
+        delay               = 'animate-delay-0',
+        class: className    = '',
         children
     }: {
         borderColor?    : string;
         showGlow?       : boolean;
+        showAura?       : boolean;
         class?          : string;
+        animate?        : string;
+        duration?       : string;
+        delay?          : string;
         children?       : any;
     } = $props();
 
@@ -32,6 +40,16 @@
     };
 
 
+    // const bgClasses: Record<string, string> = {
+    //     'nen-int'   : 'bg-nen-int',
+    //     'nen-tra'   : 'bg-nen-tra',
+    //     'nen-mat'   : 'bg-nen-mat',
+    //     'nen-esp'   : 'bg-nen-esp',
+    //     'nen-man'   : 'bg-nen-man',
+    //     'nen-emi'   : 'bg-nen-emi'
+    // };
+
+
     const nenColorVars: Record<string, string> = {
         'nen-int'   : 'hsl(45 100% 50%)',
         'nen-tra'   : 'hsl(280 80% 60%)',
@@ -46,7 +64,7 @@
 </script>
 
 <div 
-    class="p-8 rounded-2xl border {borderColorClasses[borderColor]} {showGlow ? glowClasses[borderColor] : ''} relative overflow-hidden backdrop-blur-xs {className}"
+    class="p-8 rounded-2xl border {borderColorClasses[borderColor]} {showGlow ? glowClasses[borderColor] : ''} relative overflow-hidden backdrop-blur-xs {animate} {duration} {delay} {className}"
     style="background: linear-gradient( 135deg, {currentColor}03, {currentColor}08, {currentColor}03 );"
 >
     {#if showGlow}
@@ -55,6 +73,18 @@
         
         <!-- Subtle pattern -->
         <div class="absolute inset-0 opacity-5" style="background-image: radial-gradient( circle at 2px 2px, {currentColor} 1px, transparent 0 ); background-size: 32px 32px;"></div>
+    {/if}
+
+    {#if showAura}
+        <div 
+            class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] pointer-events-none z-0"
+            style="
+                background: radial-gradient(circle, {currentColor} 0%, transparent 70%);
+                opacity: 0.25;
+                filter: blur(60px);
+                animation: fade-in 1s ease-out 0.2s backwards;
+            "
+        ></div>
     {/if}
 
     <div class="relative z-10">
