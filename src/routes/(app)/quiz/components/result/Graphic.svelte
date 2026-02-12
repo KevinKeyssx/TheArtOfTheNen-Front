@@ -13,7 +13,7 @@
     } from 'chart.js';
 
     import NenCard              from "$lib/components/cards/nen-card.svelte";
-    import { nenColorVars }     from "$lib/utils/nen-colors";
+    import { colorClasses, nenColorVars, textColorClasses }     from "$lib/utils/nen-colors";
     import type { NenResult }   from '$lib/models/nen';
 
 
@@ -147,8 +147,13 @@
     borderColor = { result.primary.color }
     showGlow    = { false}
     showAura    = { true }
-    delay       = "animate-delay-2000"
+    delay       = "animate-delay-4000"
 >
+    <div class="flex items-center gap-2 mb-4">
+        <div class="w-1 h-6 rounded-full {colorClasses[result.primary.color]}"></div>
+        <h3 class="text-lg font-bold {textColorClasses[result.primary.color]}">Afinidad de tu Aura</h3>
+    </div>
+
     <div class="relative w-full h-[300px] sm:h-[400px] flex items-center justify-center">
         <canvas bind:this={chartCanvas}></canvas>
     </div>

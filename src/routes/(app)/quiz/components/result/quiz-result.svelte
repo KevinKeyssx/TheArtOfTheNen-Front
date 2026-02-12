@@ -1,97 +1,107 @@
 <script lang="ts">
+    import { onMount } from 'svelte';
     import { goto } from '$app/navigation';
-
-    import { toPng } from 'html-to-image';
 
     import {
         colorClasses,
         textColorClasses,
-        borderColorClasses
+        borderColorClasses,
+        nenColorVars
     }                           from '$lib/utils/nen-colors';
+    import {
+        getLocalStorage,
+        LOCAL_STORAGE_KEYS
+    }                           from '$lib/utils/local-storage';
     import PulseButton          from '$lib/components/buttons/pulse-button.svelte';
     import ShareButton          from '$lib/components/buttons/share-button.svelte';
     import AuraButton           from '$lib/components/buttons/aura-button.svelte';
     import NenCard              from '$lib/components/cards/nen-card.svelte';
     import RepeatIcon           from '$lib/components/icons/RepeatIcon.svelte';
-    import Graphic              from '$lib/components/quiz/result/Graphic.svelte';
-    import Share                from '$lib/components/quiz/result/Share.svelte';
+    import Graphic              from './Graphic.svelte';
+    import Share                from '$lib/components/Share.svelte';
     import type { NenResult }   from '$lib/models/nen';
 
 
-    let { result, onRestart }: { result: NenResult; onRestart: () => void } = $props();
+    let {
+        result,
+        onRestart
+    }: {
+        result      : NenResult;
+        onRestart   : () => void
+    } = $props();
+
+
     let showShareDialog = $state( false );
-    let generatedImage  = $state<string | null>( null );
+    let invokeStatus    = $state( 'Invocar mi Habilidad Especial' );
+
+    // svelte-ignore state_referenced_locally
+    const shareText         = `¡Acabo de descubrir mi tipo de Nen! Soy ${result.primary.name} con ${result.secondary.name} secundario. 🔥✨⚡ ¿Cuál es el tuyo?`;
+    const shareCardId       = 'nen-share-card';
+    const toggleShareDialog = (): boolean => showShareDialog = !showShareDialog;
 
 
-    const shareCardId = 'hatsu-share-card';
+    onMount( () => {
+        const status = getLocalStorage( LOCAL_STORAGE_KEYS.NEN_HATSU_RESULT )
 
-
-    function toggleShareDialog() {
-        if ( showShareDialog ) {
-            showShareDialog = false;
+        if ( status ) {
+            invokeStatus = 'Ver mi Habilidad Especial';
         } else {
-            if ( !generatedImage ) {
-                shareAsImage();
-            } else {
-                showShareDialog = true;
-            }
+            invokeStatus = 'Invocar mi Habilidad Especial';
         }
-    }
+    });
 
+    function invokeHatsu(): void {
+        const base = `/invoke?primary=${result.primary.code}&secondary=${result.secondary.code}`;
 
-    async function shareAsImage() {
-        const elementToCapture = document.getElementById( shareCardId );
-
-        if ( !elementToCapture ) {
-            console.error( "No se encontró el elemento" );
-            return;
-        }
-
-        try {
-            // Aseguramos carga de fuentes o estilos
-            await new Promise( resolve => setTimeout( resolve, 100 ));
-
-            const dataUrl = await toPng(elementToCapture, { 
-                cacheBust       : true,
-                backgroundColor : '#0c0e12',
-                pixelRatio      : 2, // Mejor calidad
-                style           : {
-                    transform: 'scale(1)',
-                }
-            });
-
-            generatedImage  = dataUrl;
-            showShareDialog = true;
-        } catch ( error ) {
-            console.error('Error generando la imagen:', error);
+        if ( invokeStatus === 'Invocar mi Habilidad Especial' ) {
+            goto( base );
+        } else {
+            goto( `${base}&pageState=revealed` );
         }
     }
 </script>
+
 
 <div class="min-h-screen flex items-center justify-center  relative">
     <!-- Large background glow -->
     <div  class="max-w-4xl mx-auto w-full relative">
         <!-- !HTMLToImage -->
-        <div id={ shareCardId } class="px-18 space-y-6 pt-12 pb-6">
-            <div class="text-center opacity-0 animate-fade-in-up" style="animation-delay: 200ms; animation-fill-mode: both;">
-                <h1 class="text-2xl sm:text-3xl font-bold text-foreground mb-2">Tu Tipo de Nen ha sido Revelado</h1>
-                <!-- <p class="text-muted-foreground">Basado en tus respuestas, este es tu perfil de aura</p> -->
+        <div id={ shareCardId } class="px-6 sm:px-8 md:px-18 space-y-6 pt-12 pb-6">
+            <div class="text-center opacity-0 animate-fade-in-down animate-duration-1000">
+                <h1 
+                    class="text-2xl sm:text-3xl font-bold text-transparent bg-clip-text mb-2 px-0 sm:px-7 md:px-16 xl:px-0"
+                    style="background-image: linear-gradient(to right, {nenColorVars[result.primary.color]}, {nenColorVars[result.secondary.color]});"
+                >
+                    Tu Tipo de Nen ha sido Revelado
+                </h1>
+
+                <p class="text-muted-foreground">Basado en tus respuestas, este es tu perfil de aura</p>
             </div>
 
             <NenCard
                 borderColor = { result.primary.color }
                 showGlow    = { true }
                 showAura    = { true }
+                animate     = { 'animate-blurred-fade-in' }
+                delay       = { 'animate-delay-1000' }
+                duration    = { 'animate-duration-3000' }
             >
+                <div
+                    class="fixed top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full opacity-15 blur-3xl transition-opacity duration-1000 {colorClasses[result.primary.color]}"
+                ></div>
+
                 <div class="flex items-center justify-center gap-2 mb-2">
                     <span class="px-3 py-1 text-sm font-medium rounded-full {colorClasses[result.primary.color]}/50 {textColorClasses[result.primary.color]}">
                         Tipo Principal
                     </span>
                 </div>
 
-                <h2 class="text-3xl text-center mb-4 sm:text-4xl font-bold {textColorClasses[result.primary.color]}">
+                <h3
+                    class="text-center text-2xl sm:text-5xl md:text-5xl font-bold {textColorClasses[result.primary.color]} mb-3"
+                    style="text-shadow: 0 0 40px {nenColorVars[result.primary.color]}, 0 0 80px {nenColorVars[result.primary.color]}40;"
+                >
                     { result.primary.name }
-                </h2>
+                </h3>
 
                 <video 
                     src="/videos/{result.primary.name}.mp4" 
@@ -129,7 +139,7 @@
             <NenCard
                 borderColor = { result.secondary.color }
                 showGlow    = { false }
-                class       = "animate-delay-1000"
+                class       = "animate-delay-3000"
                 showAura    = { true }
             >
                 <div class="flex items-center gap-4">
@@ -158,30 +168,39 @@
         </div>
 
         <!-- Actions -->
-        <div class="animate-zoom-in animate-duration-1000 animate-delay-3000 mb-10">
+        <div class="animate-fade-in-up animate-duration-1000 animate-delay-5000 mb-10">
             <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mt-0 flex-wrap">
                 <!-- Botón de repetir -->
-                <PulseButton text="Repetir el Test" onClick={onRestart} >
+                <PulseButton
+                    onClick={onRestart}
+                    className = "w-60 sm:w-32 lg:w-52"
+                >
                     <RepeatIcon />
+
+                    <span class="block sm:hidden lg:block">Repetir el Test</span>
                 </PulseButton>
 
                 <!-- Botón de invocar habilidad -->
                 <AuraButton
-                    text            = "Invocar mi Habilidad Especial"
-                    onclick         = {() => goto(`/invoke?primary=${result.primary.code}&secondary=${result.secondary.code}`)}
+                    text            = { invokeStatus }
+                    onclick         = { invokeHatsu }
                     primaryColor    = { result.primary.color }
                 />
 
                 <!-- Botón de Compartir -->
-                <ShareButton onClick={() => toggleShareDialog()} text="Compartir Resultado" />
+                <ShareButton
+                    onClick = { toggleShareDialog }
+                    text    = "Compartir Resultado"
+                />
             </div>
         </div>
     </div>
 </div>
 
 <Share
-    { result }
-    { generatedImage }
-    onclick={ toggleShareDialog }
+    { shareText }
     { showShareDialog }
+    imageName       = { result.primary.name }
+    onclick         = { toggleShareDialog }
+    shareElementId  = { shareCardId }
 />

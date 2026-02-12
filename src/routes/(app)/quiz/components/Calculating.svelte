@@ -6,7 +6,7 @@
 <div class="min-h-screen flex items-center justify-center px-4">
     <div class="text-center">
         <!-- Animated hexagon -->
-        <div class="relative w-48 h-48 mx-auto mb-8">
+        <div class="relative w-48 h-48 mx-auto mb-8 animate-blurred-fade-in animate-duration-2000">
             <AuraFarm
                 size={1.5}
             />
@@ -18,14 +18,14 @@
             loop 
             muted 
             playsinline
-            class="rounded-lg shadow-lg mx-auto mb-6 max-w-xs w-full"
+            class="rounded-lg shadow-lg mx-auto mb-6 max-w-xs w-full animate-bounce-fade-in animate-duration-1000"
         >
             Tu navegador no soporta videos.
         </video>
 
-        <h2 class="text-2xl font-bold text-foreground mb-2">Farmeando tu Aura...</h2>
+        <h2 class="text-2xl font-bold text-amber-500 mb-2 animate-duration-2000 animate-pulse">Farmeando tu Aura...</h2>
 
-        <p class="text-muted-foreground">Determinando tu tipo de Nen</p>
+        <p class="text-muted-foreground animate-fade-in-left">Determinando tu tipo de Nen</p>
 
         <!-- Loading dots -->
         <div class="flex items-center justify-center gap-2 mt-6">

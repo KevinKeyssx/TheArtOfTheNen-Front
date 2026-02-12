@@ -48,7 +48,7 @@
 
 <div class="min-h-screen flex flex-col pt-20 pb-8 px-4">
     <!-- Progress bar -->
-    <div class="max-w-2xl mx-auto w-full mb-8">
+    <div class="max-w-2xl mx-auto w-full mb-8 mt-12 xl:mt-0 animate-fade-in-down">
         <div class="flex items-center justify-between mb-2">
             <span class="text-sm text-muted-foreground">Pregunta {currentQuestionIndex + 1} de {questions.length}</span>
 
@@ -67,29 +67,28 @@
     <div class="flex-1 flex items-center justify-center">
         <div class="max-w-2xl mx-auto w-full">
             {#key currentQuestionIndex}
-                <div class="animate-fade-in-up">
-                    <h2 class="text-xl sm:text-2xl font-bold text-white mb-8 text-center text-balance drop-shadow-lg">
-                        {currentQuestion.question}
+                <div class="">
+                    <h2 class="text-xl sm:text-2xl font-bold text-amber-500 mb-8 text-center text-balance drop-shadow-lg animate-zoom-in">
+                        { currentQuestion.question }
                     </h2>
 
-                    <div class="space-y-3">
+                    <div class="space-y-3 ">
                         {#each currentQuestion.options as option, index}
                         {@const isSelected = selectedOption === option.value}
                         <button
                             onclick={() => selectAnswer(option.value)}
                             disabled={isTransitioning}
-                            class="w-full p-4 text-left rounded-xl border-2 transition-all duration-300 
+                            class="w-full p-4 text-left rounded-xl border-2 transition-all animate-fade-in-up animate-delay-[{index * 0.5}s]
                             {isSelected 
-                                ? 'bg-purple-600/20 border-purple-400 scale-[1.02] shadow-lg shadow-purple-500/40'
-                                : 'bg-purple-900/10 border-purple-700/30 hover:border-purple-500/60 hover:bg-purple-800/20 backdrop-blur-sm'
+                                ? 'bg-amber-600/20 border-amber-400 scale-[1.02] shadow-lg shadow-amber-500/40'
+                                : 'bg-amber-900/10 border-amber-700/30 hover:border-amber-500/60 hover:bg-amber-800/20 backdrop-blur-sm'
                             }
                             {isTransitioning && !isSelected ? 'opacity-50' : ''}
                             disabled:cursor-not-allowed"
-                            style="animation-delay: {index * 0.05}s;"
                         >
                             <div class="flex items-start gap-3">
                                 <span class="w-8 h-8 rounded-full border-2 flex items-center justify-center text-sm font-semibold shrink-0 
-                                    {isSelected ? 'bg-purple-500 text-white border-purple-300' : 'text-purple-300 border-purple-600'}">
+                                    {isSelected ? 'bg-amber-500 text-white border-amber-300' : 'text-amber-300 border-amber-600'}">
                                     {String.fromCharCode(65 + index)}
                                 </span>
 
