@@ -11,15 +11,17 @@
     import PulseButton      from '$lib/components/buttons/pulse-button.svelte';
     import MagicButton      from '$lib/components/buttons/MagicButton.svelte';
     import NenCard          from '$lib/components/cards/nen-card.svelte';
+    import PowerButton      from '$lib/components/buttons/PowerButton.svelte';
 
 
-    const nenTypesArray = Object.values(NEN_TYPES);
+    const nenTypesArray = Object.values( NEN_TYPES );
 
 
-    function scrollToSection(id: string) {
-        const element = document.getElementById(id);
-        if (element) {
-        element.scrollIntoView({ behavior: 'smooth' });
+    function scrollToSection( id: string ): void {
+        const element = document.getElementById( id );
+
+        if ( element ) {
+            element.scrollIntoView({ behavior: 'smooth' });
         }
     }
 </script>
@@ -34,33 +36,38 @@
     <!-- Navigation -->
     <nav class="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex items-center justify-between h-16">
-            <div class="flex items-center gap-2">
-            <div class="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
-                <div class="w-4 h-4 rounded-full bg-primary aura-pulse"></div>
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center gap-2">
+                    <!-- <div class="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
+                        <div class="w-4 h-4 rounded-full bg-primary aura-pulse"></div>
+                    </div> -->
+                    <img src="logo.png" alt="Logo" class="w-8 h-8">
+
+                    <span class="text-lg font-bold text-foreground">NEN</span>
+                </div>
+
+                <div class="hidden md:flex items-center gap-6">
+                    <button onclick={() => scrollToSection('tipos')} class="text-sm text-muted-foreground hover:text-primary transition-colors">
+                        Tipos de Nen
+                    </button>
+
+                    <button onclick={() => scrollToSection('basicas')} class="text-sm text-muted-foreground hover:text-primary transition-colors">
+                        Tecnicas Basicas
+                    </button>
+
+                    <button onclick={() => scrollToSection('avanzadas')} class="text-sm text-muted-foreground hover:text-primary transition-colors">
+                        Tecnicas Avanzadas
+                    </button>
+
+                    <a href="/quiz" class="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors">
+                        Descubre tu Nen
+                    </a>
+                </div>
+
+                <a href="/quiz" class="md:hidden px-3 py-1.5 bg-primary text-primary-foreground rounded-lg text-sm font-medium">
+                    Quiz
+                </a>
             </div>
-            <span class="text-lg font-bold text-foreground">NEN</span>
-            </div>
-            
-            <div class="hidden md:flex items-center gap-6">
-            <button onclick={() => scrollToSection('tipos')} class="text-sm text-muted-foreground hover:text-primary transition-colors">
-                Tipos de Nen
-            </button>
-            <button onclick={() => scrollToSection('basicas')} class="text-sm text-muted-foreground hover:text-primary transition-colors">
-                Tecnicas Basicas
-            </button>
-            <button onclick={() => scrollToSection('avanzadas')} class="text-sm text-muted-foreground hover:text-primary transition-colors">
-                Tecnicas Avanzadas
-            </button>
-            <a href="/quiz" class="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors">
-                Descubre tu Nen
-            </a>
-            </div>
-            
-            <a href="/quiz" class="md:hidden px-3 py-1.5 bg-primary text-primary-foreground rounded-lg text-sm font-medium">
-            Quiz
-            </a>
-        </div>
         </div>
     </nav>
 
@@ -88,6 +95,7 @@
         <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
             <PulseButton
                 onClick={() => scrollToSection('tipos')}
+                className="w-42"
             >
                 <span>Explorar el Nen</span>
             </PulseButton>
@@ -167,7 +175,7 @@
     </section>
 
     <!-- CTA Section -->
-    <div class="max-w-3xl mx-auto text-center mb-20">
+    <div class="max-w-3xl mx-auto text-center mb-20 px-6 md:px-0">
         <NenCard showGlow = { true } showAura = { true }>
             <div class="relative z-10">
                 <div class="w-16 h-16 mx-auto mb-6 rounded-full bg-primary/20 flex items-center justify-center">
@@ -197,12 +205,18 @@
     </div>
 
     <!-- Footer -->
-    <footer class="py-8 px-4 border-t border-border">
-        <div class="max-w-7xl mx-auto text-center">
-        <p class="text-sm text-muted-foreground">
-            Contenido basado en el manga y anime Hunter x Hunter de Yoshihiro Togashi.
-            Este es un proyecto de fans sin fines de lucro.
-        </p>
+    <footer class="py-5 px-4 border-t border-border">
+        <div class="max-w-7xl mx-auto text-center flex flex-col items-center">
+            <p class="text-sm text-muted-foreground">
+                Contenido basado en el manga y anime Hunter x Hunter de Yoshihiro Togashi.
+                Este es un proyecto de fans sin fines de lucro.
+            </p>
+
+            <p class="text-sm text-primary mb-2">
+                Desarrollado por:
+            </p>
+
+            <PowerButton />
         </div>
     </footer>
 </div>
