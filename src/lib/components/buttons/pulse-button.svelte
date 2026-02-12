@@ -1,16 +1,20 @@
 <script lang="ts">
     let {
         onClick,
-        text,
-        children
-    }: { onClick: () => void, text: string, children?: any } = $props();
+        children,
+        className
+    }: {
+        onClick: () => void,
+        children?: any,
+        className?: string
+    } = $props();
 </script>
 
-<button class="button" onclick={onClick}>
-    {@render children?.()}
 
-    { text }
+<button class="button {className}" onclick={onClick}>
+    {@render children?.()}
 </button>
+
 
 <style>
     .button {
