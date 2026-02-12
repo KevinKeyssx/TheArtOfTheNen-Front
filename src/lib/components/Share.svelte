@@ -202,7 +202,7 @@
                             <img src={generatedImage} alt="Resultado Nen" class="w-full h-auto object-contain" />
                             <button 
                                 onclick={downloadImage}
-                                class="absolute top-3 right-3 p-2 bg-black/60 hover:bg-black/80 text-white rounded-full opacity-0 group-hover:opacity-100 transition-all backdrop-blur-sm transform hover:scale-110"
+                                class="absolute top-3 right-3 p-1.5 bg-transparent text-primary border border-primary rounded-full transition-all backdrop-blur-sm transform hover:scale-110 shadow-lg hover:shadow-xl shadow-amber-500/50 hover:shadow-amber-500/90 animate-bounce animate-duration-1000"
                                 title="Descargar imagen"
                             >
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
