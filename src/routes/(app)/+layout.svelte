@@ -6,6 +6,8 @@
     import PulseButton      from '$lib/components/buttons/pulse-button.svelte';
     import BackIcon         from '$lib/components/icons/BackIcon.svelte';
     import { SOUND_FILES }  from '$lib/utils/player';
+    import PlayIcon         from '$lib/components/icons/PlayIcon.svelte';
+    import PauseIcon        from '$lib/components/icons/PauseIcon.svelte';
 
 
     let { children } = $props();
@@ -209,7 +211,6 @@
     <!-- Botón Volver y Reproductor -->
     <div class="fixed bottom-4 md:bottom-auto md:top-4 left-4 right-4 mx-2 lg:mx-32 xl:mx-10 2xl:mx-20 @max-3xl:mx-96 mt-10 z-50 flex items-center justify-between gap-4">
         <!-- Botón Volver -->
-        <!-- text="Volver" -->
         <PulseButton
             onClick={() => goto(returnTo)}
         >
@@ -224,18 +225,14 @@
                     <!-- Botón Play/Pause -->
                     <button
                         onclick={togglePlay}
-                        class="w-10 h-10 rounded-full bg-linear-to-br from-primary/20 to-primary/10 hover:from-primary/30 hover:to-primary/20 border-2 border-primary/50 flex items-center justify-center shrink-0 transition-all hover:scale-110 hover:shadow-lg hover:shadow-primary/30"
+                        class="w-10 h-10 rounded-full bg-linear-to-br from-primary/20 to-primary/10 hover:from-primary/30 hover:to-primary/20 border-2 border-primary/50 flex items-center justify-center shrink-0 transition-all hover:scale-110 hover:shadow-lg hover:shadow-primary/30 text-amber-500"
                         aria-label={isPlaying ? 'Pausar música' : 'Reproducir música'}
                         title={isPlaying ? 'Pausar música' : 'Reproducir música'}
                     >
                         {#if isPlaying}
-                            <svg class="w-5 h-5 text-primary" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/>
-                            </svg>
+                            <PauseIcon />
                         {:else}
-                            <svg class="w-5 h-5 text-primary ml-0.5" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M8 5v14l11-7z"/>
-                            </svg>
+                            <PlayIcon />
                         {/if}
                     </button>
 
@@ -337,23 +334,19 @@
                         <div class="flex flex-col gap-4">
                             <!-- Título / Info -->
                             <div class="text-center">
-                                <span class="text-xs text-muted-foreground uppercase tracking-widest font-semibold">Reproductor Nen</span>
+                                <h4 class="text-xs text-amber-600 uppercase tracking-widest font-semibold">Reproductor Nen</h4>
                             </div>
 
                             <!-- Botón Play Central -->
                             <div class="flex justify-center">
                                 <button
                                     onclick={togglePlay}
-                                    class="w-14 h-14 rounded-full bg-linear-to-br from-primary/20 to-primary/10 border-2 border-primary/50 flex items-center justify-center shadow-lg shadow-primary/20 active:scale-95 transition-transform"
+                                    class="w-14 h-14 rounded-full bg-linear-to-br from-primary/20 to-primary/10 border-2 border-primary/50 flex items-center justify-center shadow-lg shadow-primary/20 active:scale-95 transition-transform text-amber-500"
                                 >
                                     {#if isPlaying}
-                                        <svg class="w-6 h-6 text-primary" fill="currentColor" viewBox="0 0 24 24">
-                                            <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/>
-                                        </svg>
+                                        <PauseIcon />
                                     {:else}
-                                        <svg class="w-6 h-6 text-primary ml-1" fill="currentColor" viewBox="0 0 24 24">
-                                            <path d="M8 5v14l11-7z"/>
-                                        </svg>
+                                        <PlayIcon />
                                     {/if}
                                 </button>
                             </div>
