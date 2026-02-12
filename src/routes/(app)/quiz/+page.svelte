@@ -13,7 +13,7 @@
     import {
         getRandomQuestions,
         calculateNenResult,
-    }                   from '$lib/data/nen-data';
+    }                   from '$lib/data/quiz-data';
     import {
         playSound,
         SOUND_FILES
