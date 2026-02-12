@@ -28,7 +28,7 @@
     --card-foreground: hsl(60 10% 95%);
     --popover: hsl(220 18% 10%);
     --popover-foreground: hsl(60 10% 95%);
-    --primary: hsl(45 95% 55%);
+    --primary: hsl(38 92% 50%);
     --primary-foreground: hsl(220 20% 6%);
     --secondary: hsl(220 15% 15%);
     --secondary-foreground: hsl(60 10% 95%);
@@ -40,7 +40,7 @@
     --destructive-foreground: hsl(0 0% 98%);
     --border: hsl(220 15% 20%);
     --input: hsl(220 15% 15%);
-    --ring: hsl(45 95% 55%);
+    --ring: hsl(38 92% 50%);
     
     /* Nen Type Colors */
     --nen-intensificacion: hsl(45 100% 50%);
@@ -84,7 +84,7 @@
     --color-border: var(--border);
     --color-input: var(--input);
     --color-ring: var(--ring);
-    
+
     /* Nen Colors for Tailwind */
     --color-nen-int: var(--nen-intensificacion);
     --color-nen-tra: var(--nen-transmutacion);
@@ -92,7 +92,7 @@
     --color-nen-esp: var(--nen-especializacion);
     --color-nen-man: var(--nen-manipulacion);
     --color-nen-emi: var(--nen-emision);
-    
+
     /* Purple colors */
     --color-purple-300: rgb(216, 180, 254);
     --color-purple-400: rgb(192, 132, 252);
@@ -101,12 +101,12 @@
     --color-purple-700: rgb(126, 34, 206);
     --color-purple-800: rgb(107, 33, 168);
     --color-purple-900: rgb(88, 28, 135);
-    
+
     /* Amber colors */
     --color-amber-200: rgb(253, 230, 138);
     --color-amber-500: rgb(245, 158, 11);
     --color-amber-600: rgb(217, 119, 6);
-    
+
     /* Zinc colors */
     --color-zinc-200: rgb(228, 228, 231);
     --color-zinc-300: rgb(212, 212, 216);
@@ -116,7 +116,7 @@
     --color-zinc-700: rgb(63, 63, 70);
     --color-zinc-800: rgb(39, 39, 42);
     --color-zinc-900: rgb(24, 24, 27);
-    
+
     --color-sidebar: var(--sidebar-background);
     --color-sidebar-foreground: var(--sidebar-foreground);
     --color-sidebar-primary: var(--sidebar-primary);
@@ -141,6 +141,17 @@
     }
     h1, h2, h3, h4, h5, h6 {
         font-family: 'Shojumaru', sans-serif;
+    }
+
+    /* Text Selection Styling */
+    ::selection {
+        background-color: hsl(38 92% 50% / 0.3);
+        color: hsl(45 100% 95%);
+    }
+
+    ::-moz-selection {
+        background-color: hsl(38 92% 50% / 0.3);
+        color: hsl(45 100% 95%);
     }
 }
 
@@ -186,91 +197,6 @@
     animation: float-particle 3s ease-in-out infinite;
 }
 
-/* Fade in animation */
-/* @keyframes fade-in-up {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-.animate-fade-in-up {
-    animation: fade-in-up 0.6s ease-out forwards;
-} */
-
-/* Progress bar animation */
-@keyframes progress-fill {
-    from { width: 0%; }
-}
-
-.animate-progress {
-    animation: progress-fill 0.5s ease-out forwards;
-}
-
-/* Reveal animation */
-@keyframes reveal {
-    0% { transform: scale(0.8); opacity: 0; }
-    50% { transform: scale(1.1); }
-    100% { transform: scale(1); opacity: 1; }
-}
-
-.animate-reveal {
-    animation: reveal 0.8s ease-out forwards;
-}
-
-/* Energy charge animation */
-@keyframes energy-charge {
-    0% { transform: scale(0); opacity: 0; }
-    30% { transform: scale(1.3); opacity: 0.8; }
-    60% { transform: scale(0.9); opacity: 1; }
-    80% { transform: scale(1.1); opacity: 0.9; }
-    100% { transform: scale(1); opacity: 1; }
-}
-
-.animate-energy-charge {
-    animation: energy-charge 1.2s ease-out forwards;
-}
-
-/* Glow pulse */
-@keyframes glow-pulse {
-    0%, 100% { box-shadow: 0 0 20px currentColor, 0 0 40px currentColor; opacity: 0.6; }
-    50% { box-shadow: 0 0 40px currentColor, 0 0 80px currentColor; opacity: 1; }
-}
-
-.animate-glow-pulse {
-    animation: glow-pulse 2s ease-in-out infinite;
-}
-
-/* Text reveal letter by letter illusion */
-@keyframes typewriter-line {
-    from { max-height: 0; opacity: 0; }
-    to { max-height: 200px; opacity: 1; }
-}
-
-.animate-typewriter-line {
-    animation: typewriter-line 0.4s ease-out forwards;
-    overflow: hidden;
-}
-
-/* Float up particles */
-@keyframes rise-particle {
-    0% { transform: translateY(0) scale(1); opacity: 1; }
-    100% { transform: translateY(-120px) scale(0); opacity: 0; }
-}
-
-.animate-rise-particle {
-    animation: rise-particle 2s ease-out forwards;
-}
-
-/* Shimmer effect */
-@keyframes shimmer {
-    0% { background-position: -200% 0; }
-    100% { background-position: 200% 0; }
-}
-
-.animate-shimmer {
-    background-size: 200% 100%;
-    animation: shimmer 3s linear infinite;
-}
-
 /* Spin slow */
 @keyframes spin-slow {
     from { transform: rotate(0deg); }
@@ -279,44 +205,4 @@
 
 .animate-spin-slow {
     animation: spin-slow 8s linear infinite;
-}
-
-/* Fade in animation for modal backdrop */
-@keyframes fade-in {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
-
-.animate-fade-in {
-    animation: fade-in 0.2s ease-out forwards;
-}
-
-/* Scale in animation for modal content */
-@keyframes scale-in {
-    from { 
-        opacity: 0; 
-        transform: scale(0.95); 
-    }
-    to { 
-        opacity: 1; 
-        transform: scale(1); 
-    }
-}
-
-.animate-scale-in {
-    animation: scale-in 0.2s ease-out forwards;
-}
-
-/* Pulse glow for invoke button */
-@keyframes pulse-glow {
-    0%, 100% { 
-        box-shadow: 0 0 20px currentColor, 0 0 40px currentColor; 
-    }
-    50% { 
-        box-shadow: 0 0 30px currentColor, 0 0 60px currentColor, 0 0 80px currentColor; 
-    }
-}
-
-.animate-pulse-glow {
-    animation: pulse-glow 2s ease-in-out infinite;
 }
