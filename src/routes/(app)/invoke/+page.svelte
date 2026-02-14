@@ -71,7 +71,10 @@
 
     // Guardar hatsuResult en localStorage cuando cambie
     $effect(() => {
-        if ( typeof window !== 'undefined' && hatsuResult ) {
+        if ( hatsuResult && pageState === 'revealed' ) {
+            const haveResult = getLocalStorage( LOCAL_STORAGE_KEYS.NEN_HATSU_RESULT );
+
+            if ( !haveResult ) playSound( SOUND_FILES.RESULT, 0.3 );
             setLocalStorage( LOCAL_STORAGE_KEYS.NEN_HATSU_RESULT, hatsuResult );
         }
     });
@@ -80,7 +83,7 @@
     $effect(() => {
         const soundFile = stateSounds[ pageState ];
 
-        if ( soundFile && ( pageState !== 'revealed' || hatsuResult )) {
+        if ( soundFile && pageState !== 'revealed' ) {
             playSound( soundFile, 0.3 );
         }
     });

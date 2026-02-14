@@ -46,7 +46,9 @@
         const soundFile = stateSounds[ quizState ];
 
         if ( soundFile && ( quizState !== 'result' || result )) {
-            playSound( soundFile, 0.3 );
+            const haveResult = getLocalStorage( LOCAL_STORAGE_KEYS.NEN_QUIZ_RESULT );
+
+            if ( !haveResult ) playSound( soundFile, 0.3 );
         }
     });
 
