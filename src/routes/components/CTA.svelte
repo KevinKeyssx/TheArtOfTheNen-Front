@@ -11,11 +11,11 @@
             </div>
 
             <h2 class="text-2xl sm:text-3xl font-bold text-foreground mb-4">
-                Descubre tu Tipo de Nen
+                Descubre tu tipo de <span class="text-primary">Nen</span>
             </h2>
 
-            <p class="text-muted-foreground mb-8 max-w-lg mx-auto">
-                Responde nuestro cuestionario de personalidad y descubre cual seria tu tipo de aura 
+            <p class="text-amber-100 mb-8 max-w-lg mx-auto">
+                Responde nuestro cuestionario de personalidad y descubre cual sería tu tipo de aura 
                 si fueras un usuario de Nen en el mundo de Hunter x Hunter.
             </p>
 
