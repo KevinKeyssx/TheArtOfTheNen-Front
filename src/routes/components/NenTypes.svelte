@@ -9,7 +9,7 @@
 <section id="tipos" class="py-20 px-4 relative">
     <div class="max-w-7xl mx-auto">
         <div class="text-center mb-16">
-            <h2 class="text-3xl sm:text-4xl font-bold text-foreground mb-4">Los 6 Tipos de Nen</h2>
+            <h2 class="text-2xl sm:text-4xl font-bold text-foreground mb-4">Los 6 Tipos de Nen</h2>
 
             <p class="text-muted-foreground max-w-2xl mx-auto">
                 Cada usuario de Nen nace con una afinidad natural hacia uno de los seis tipos. 
@@ -20,7 +20,7 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {#each nenTypesArray as nenType, index}
                 <div class="animate-fade-in-up" style="animation-delay: {index * 0.1}s;">
-                    <NenTypeCard {nenType} />
+                    <NenTypeCard { nenType } />
                 </div>
             {/each}
         </div>
