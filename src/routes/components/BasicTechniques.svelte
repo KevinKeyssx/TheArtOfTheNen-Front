@@ -7,10 +7,10 @@
 <section id="basicas" class="py-20 px-4 bg-card/50 relative">
     <div class="max-w-7xl mx-auto">
         <div class="text-center mb-16">
-            <h2 class="text-3xl sm:text-4xl font-bold text-foreground mb-4">Tecnicas Basicas</h2>
+            <h2 class="text-2xl sm:text-4xl font-bold text-foreground mb-4">Técnicas Básicas</h2>
 
             <p class="text-muted-foreground max-w-2xl mx-auto">
-                Las cuatro tecnicas fundamentales que todo usuario de Nen debe dominar. 
+                Las cuatro técnicas fundamentales que todo usuario de Nen debe dominar. 
                 Son la base sobre la cual se construyen todas las habilidades avanzadas.
             </p>
         </div>
