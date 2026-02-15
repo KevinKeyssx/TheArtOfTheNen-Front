@@ -146,7 +146,9 @@ Crea un archivo `.env` en la raíz del proyecto con las siguientes variables:
 ```env
 # Google Generative AI (Gemini)
 # Obtén tu API key en: https://makersuite.google.com/app/apikey
-PUBLIC_GEMINI_API_KEY=tu_api_key_aqui
+GEMINI_API_KEY=tu_api_key_aqui
+# Pon el nombre del modelo
+NEN_AI_MODEL=modelo_ia_elegido
 ```
 
 ### Obtener API Key de Google Gemini
