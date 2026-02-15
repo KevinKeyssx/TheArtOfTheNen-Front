@@ -104,13 +104,14 @@
                 </h3>
 
                 <video 
-                    src="/videos/{result.primary.name}.mp4" 
-                    autoplay 
-                    loop 
-                    muted 
+                    autoplay
+                    loop
+                    muted
                     playsinline
                     class="rounded-lg shadow-lg mx-auto mb-6 max-w-xs w-full"
+                    preload="metadata"
                 >
+                    <source src="/videos/{result.primary.name}.webm" type="video/webm">
                     Tu navegador no soporta videos.
                 </video>
 
