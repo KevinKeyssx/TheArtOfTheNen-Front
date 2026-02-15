@@ -1,7 +1,7 @@
 <script lang="ts">
-    import { onMount }  from 'svelte';
-    import { page }     from '$app/state';
-    import { goto, afterNavigate }     from '$app/navigation';
+    import { onMount }              from 'svelte';
+    import { page }                 from '$app/state';
+    import { goto, afterNavigate }  from '$app/navigation';
 
     import PulseButton      from '$lib/components/buttons/pulse-button.svelte';
     import BackIcon         from '$lib/components/icons/BackIcon.svelte';
