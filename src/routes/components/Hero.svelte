@@ -12,7 +12,7 @@
 </script>
 
 
-<section id="hero" class="min-h-screen flex items-center justify-center pt-18 relative">
+<section id="hero" class="min-h-screen flex items-center justify-center pt-8 sm:pt-18 relative">
     <div class="absolute inset-0 flex items-center justify-center opacity-10">
         <div class="w-[600px] h-[600px] rounded-full border border-primary/50 aura-pulse"></div>
         <div class="absolute w-[400px] h-[400px] rounded-full border border-primary/30 aura-pulse" style="animation-delay: 0.5s;"></div>
@@ -45,7 +45,7 @@
         </div>
     </div>
 
-    <div class="hidden sm:block absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
+    <div class="flex absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
         <svg class="w-6 h-6 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
         </svg>
