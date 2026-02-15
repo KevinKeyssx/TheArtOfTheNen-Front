@@ -13,13 +13,14 @@
         </div>
 
         <video 
-            src="/videos/aura_test.mp4" 
-            autoplay 
-            loop 
-            muted 
+            autoplay
+            loop
+            muted
             playsinline
             class="rounded-lg shadow-lg mx-auto mb-6 max-w-xs w-full animate-bounce-fade-in animate-duration-1000"
+            preload="metadata"
         >
+            <source src="/videos/aura_test.webm" type="video/webm">
             Tu navegador no soporta videos.
         </video>
 
