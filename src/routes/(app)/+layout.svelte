@@ -1,7 +1,7 @@
 <script lang="ts">
     import { onMount }  from 'svelte';
     import { page }     from '$app/state';
-    import { goto }     from '$app/navigation';
+    import { goto, afterNavigate }     from '$app/navigation';
 
     import PulseButton      from '$lib/components/buttons/pulse-button.svelte';
     import BackIcon         from '$lib/components/icons/BackIcon.svelte';
@@ -24,6 +24,7 @@
     let isDragging          = $state( false );
     let sliderRef           = $state<HTMLInputElement | null>( null );
     let isMobilePlayerOpen  = $state( false );
+    let shouldScrollToTop   = $state( false );
 
 
     const quizState = $derived( page.url.searchParams.get( 'quizState' ) || '' );
@@ -181,6 +182,28 @@
     }
 
 
+    function handleGoBack() {
+        // Marcar que debemos hacer scroll después de navegar
+        shouldScrollToTop = true;
+        // Navegar inmediatamente
+        goto( returnTo );
+    }
+
+    // Hacer scroll después de la navegación
+    afterNavigate(() => {
+        if ( shouldScrollToTop ) {
+            // Pequeño delay para asegurar que el DOM esté listo
+            setTimeout(() => {
+                window.scrollTo({
+                    top      : 0,
+                    behavior : 'smooth'
+                });
+                shouldScrollToTop = false;
+            }, 50 );
+        }
+    });
+
+
     onMount(() => {
         const initialSrc = getAudioSrc( window.location.pathname );
 
@@ -212,7 +235,7 @@
     <div class="fixed left-4 right-4 mx-2 lg:mx-32 xl:mx-10 2xl:mx-20 @max-3xl:mx-96 mt-10 z-50 flex items-center justify-between gap-4">
         <!-- Botón Volver -->
         <PulseButton
-            onClick={() => goto(returnTo)}
+            onClick={handleGoBack}
         >
             <BackIcon />
             <span class="hidden lg:block">Volver</span>
@@ -330,7 +353,7 @@
 
                 <!-- Menú Desplegable Móvil -->
                 {#if isMobilePlayerOpen}
-                    <div class="absolute bottom-14 right-0 md:top-12 md:bottom-auto bg-card/90 backdrop-blur-xl border border-primary/20 rounded-xl p-4 shadow-2xl w-64 animate-fade-in-up md:animate-fade-in-down origin-bottom-right md:origin-top-right z-50">
+                    <div class="absolute top-12 right-0 bg-card/90 backdrop-blur-xl border border-primary/20 rounded-xl p-4 shadow-2xl w-64 animate-fade-in-down origin-top-right z-50">
                         <div class="flex flex-col gap-4">
                             <!-- Título / Info -->
                             <div class="text-center">
