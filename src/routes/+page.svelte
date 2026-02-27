@@ -20,7 +20,7 @@
 
 
 <svelte:head>
-    <title>Nen Encyclopedia - Hunter x Hunter</title>
+    <title>TheArtOfTheNen - Hunter x Hunter</title>
     <meta name="description" content="Aprende todo sobre el sistema Nen de Hunter x Hunter: tipos de aura, tecnicas basicas y avanzadas, y descubre tu tipo de Nen." />
 </svelte:head>
 
