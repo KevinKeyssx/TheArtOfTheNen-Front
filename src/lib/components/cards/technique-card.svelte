@@ -1,10 +1,10 @@
 <script lang="ts">
     type Technique = {
-        name: string;
-        japaneseName: string;
-        description: string;
-        effects: string[];
-        example: string;
+        name            : string;
+        japaneseName    : string;
+        description     : string;
+        effects         : string[];
+        example         : string;
     };
 
     let {
@@ -43,9 +43,9 @@
 
             <div class="flex items-center gap-2">
                 <span class="px-2 py-0.5 text-xs rounded-full {isBasic ? 'bg-nen-int/20 text-nen-int' : 'bg-nen-tra/20 text-nen-tra'}">
-                    { isBasic ? 'Basica' : 'Avanzada' }
+                    { isBasic ? 'Básica' : 'Avanzada' }
                 </span>
-                
+
                 <svg 
                     class="w-5 h-5 text-muted-foreground transition-transform duration-300 {expanded ? 'rotate-180' : ''}" 
                     fill="none" 
